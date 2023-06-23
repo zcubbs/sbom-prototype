@@ -1,0 +1,8 @@
+version: v1
+name: buf.build/zel/sbom-prototype
+breaking:
+  use:
+    - FILE
+lint:
+  use:
+    - DEFAULT

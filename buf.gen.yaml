@@ -1,0 +1,30 @@
+version: v1
+managed:
+  enabled: true
+plugins:
+  # GO
+  - name: go
+    out: registry/proto # API
+    opt: paths=source_relative
+  - name: go
+    out: scanner/proto # API
+    opt: paths=source_relative
+  - name: go
+    out: api/proto # API
+    opt: paths=source_relative
+
+  # GO GRPC
+  - name: go-grpc
+    out: api/proto
+    opt: paths=source_relative,require_unimplemented_servers=false
+
+  # GO GRPC GATEWAY
+  - name: grpc-gateway
+    out: api/proto
+    opt:
+      - paths=source_relative
+      - generate_unbound_methods=true
+
+  # OPENAPI V2
+  - name: openapiv2
+    out: api/openapi

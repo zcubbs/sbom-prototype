@@ -1,0 +1,26 @@
+version: "3"
+includes: {}
+tasks:
+  pb:
+    dir: "."
+    cmds:
+      - task: pb-clean
+      - task: pb-update
+      - cmd: buf generate
+
+  pb-clean:
+    cmds:
+      - cmd: Powershell.exe Remove-Item '.\api\proto' -Recurse -Force -ErrorAction SilentlyContinue
+        ignore_error: true
+      - cmd: Powershell.exe Remove-Item '.\api\openapi' -Recurse -Force -ErrorAction SilentlyContinue
+        ignore_error: true
+      - cmd: Powershell.exe Remove-Item '.\registry\proto' -Recurse -Force -ErrorAction SilentlyContinue
+        ignore_error: true
+      - cmd: Powershell.exe Remove-Item '.\scanner\proto' -Recurse -Force -ErrorAction SilentlyContinue
+        ignore_error: true
+
+  pb-update:
+    dir: './proto'
+    cmds:
+      - cmd: buf mod update
+

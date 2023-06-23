@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+package proto.sbom.v1;
+
+option go_package = "registry/proto/sbom.v1;pb";
+
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/api/http.proto";
+import "sbom/v1/core.proto";
+
+service ScannerService {
+  rpc Scan (ScanRequest) returns (ScanResponse) {
+    option (google.api.http) = {
+      post: "/v1/scan"
+      body: "sbom"
+    };
+  }
+
+  rpc ScanResults (ScanStatusRequest) returns (ScanReportResponse) {
+    option (google.api.http) = {
+      get: "/v1/scan"
+    };
+  }
+}
+
+message ScanRequest {
+  string sbom = 1;
+}
+
+message ScanResponse {
+  string report_id = 1;
+}
+
+message ScanReport {
+  repeated string vulnerabilities = 1;
+}
+
+message ScanStatusRequest {
+  string report_id = 1;
+}
+
+message ScanReportResponse {
+  ScanReport report = 1;
+}

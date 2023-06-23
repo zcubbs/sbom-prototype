@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+package proto.sbom.v1;
+
+option go_package = "registry/proto/sbom.v1;pb";
+
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/api/http.proto";
+import "sbom/v1/core.proto";
+
+service RegistryService {
+  rpc AddSbom (AddSbomRequest) returns (AddSbomResponse) {
+    option (google.api.http) = {
+      post: "/v1/sbom/add"
+      body: "image"
+    };
+  }
+  rpc GetSbom (GetSbomRequest) returns (GetSbomResponse) {
+    option (google.api.http) = {
+      get: "/v1/sbom/get"
+    };
+  }
+  rpc GetSbomList (GetSbomListRequest) returns (stream GetSbomListResponse) {
+    option (google.api.http) = {
+      get: "/v1/sbom/list"
+    };
+  }
+}
+
+message AddSbomResponse {
+  Sbom sbom = 1;
+}
+message AddSbomRequest {
+  string image = 1;
+}
+
+message GetSbomRequest {
+  string id = 1;
+}
+message GetSbomResponse {
+  Sbom sbom = 1;
+}
+
+message GetSbomListRequest {
+  string image = 1;
+}
+message GetSbomListResponse {
+  Sbom sboms = 1;
+}
+
