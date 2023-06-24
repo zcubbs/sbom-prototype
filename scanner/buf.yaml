@@ -1,7 +1,7 @@
 version: v1
-name: buf.build/zel/sbom-prototype/scanner
+name: buf.build/sbom-prototype/scanner
 deps:
-  - buf.build/zel/sbom-prototype/third_party
+  - buf.build/sbom-prototype/third_party
 breaking:
   use:
     - FILE

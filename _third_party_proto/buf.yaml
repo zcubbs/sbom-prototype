@@ -1,5 +1,5 @@
 version: v1
-name: buf.build/zel/sbom-prototype/third_party
+name: buf.build/sbom-prototype/third_party
 breaking:
   use:
     - FILE
