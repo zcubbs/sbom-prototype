@@ -1,30 +1,26 @@
 version: v1
 managed:
   enabled: true
+  go_package_prefix:
+    default: zel/sbom-prototype/gen/proto/go
 plugins:
   # GO
   - name: go
-    out: registry/proto # API
-    opt: paths=source_relative
-  - name: go
-    out: scanner/proto # API
-    opt: paths=source_relative
-  - name: go
-    out: api/proto # API
+    out: gen/proto/go # Scanner
     opt: paths=source_relative
 
   # GO GRPC
   - name: go-grpc
-    out: api/proto
+    out: gen/proto/go
     opt: paths=source_relative,require_unimplemented_servers=false
 
   # GO GRPC GATEWAY
   - name: grpc-gateway
-    out: api/proto
+    out: gen/proto/go
     opt:
       - paths=source_relative
       - generate_unbound_methods=true
 
   # OPENAPI V2
   - name: openapiv2
-    out: api/openapi
+    out: gen/proto/go

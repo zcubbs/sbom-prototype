@@ -1,3 +1,6 @@
 version: v1
 directories:
-  - proto
+  - _third_party_proto
+  - scanner
+#  - registry
+  - cli
