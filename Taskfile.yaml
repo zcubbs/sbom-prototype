@@ -1,5 +1,7 @@
 version: "3"
 includes: {}
+env:
+  GOOS: "{{OS}}"
 tasks:
   bootstrap:
     dir: "."
@@ -8,6 +10,11 @@ tasks:
       - cmd: go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
       - cmd: go install github.com/spf13/cobra-cli@latest
       - cmd: go install github.com/kyleconroy/sqlc/cmd/sqlc@latest
+      - cmd: go install github.com/bufbuild/buf/cmd/buf@latest
+      - cmd: go install github.com/golang/protobuf/protoc-gen-go@latest
+      - cmd: go install github.com/fullstorydev/grpcurl/cmd/grpcurl@latest
+      - cmd: go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@latest
+      - cmd: go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@latest
 
   sqlc:
     cmds:
@@ -29,6 +36,8 @@ tasks:
       - task: pb-clean-{{OS}}
       - task: pb-update-scanner
       - task: pb-update-registry
+      - task: pb-lint-scanner
+      - task: pb-lint-registry
       - task: pb-gen-scanner
       - task: pb-gen-registry
 
@@ -70,3 +79,41 @@ tasks:
     cmds:
       - cmd: buf generate
 
+  pb-lint-scanner:
+    dir: "_proto/pb/scanner"
+    cmds:
+      - cmd: buf lint
+
+  pb-lint-registry:
+    dir: "_proto/pb/registry"
+    cmds:
+      - cmd: buf lint
+
+  tls:
+    env:
+      SCANNER_DIR: './scanner'
+      REGISTRY_DIR: './registry'
+      CLI_DIR: './cli'
+      SCRIPTS_DIR: '_scripts'
+      TLS_DIR: 'tls'
+      TLS_GENERATED_DIR: 'tls/generated'
+      GENERATED_DIR: '_gen'
+    cmds:
+      - task: tls-scanner-{{OS}}
+
+  tls-scanner-windows:
+    cmds:
+      - echo "Generating SSL certificate..." $SCRIPTS_DIR
+      - cmd: Powershell.exe New-Item -Path $SCRIPTS_DIR/$TLS_GENERATED_DIR -ItemType Directory -ErrorAction SilentlyContinue
+        ignore_error: true
+      - openssl genrsa -out $SCRIPTS_DIR/$TLS_GENERATED_DIR/ca.key 4096
+      - openssl req -new -x509 -key $SCRIPTS_DIR/$TLS_GENERATED_DIR/ca.key -sha256 -subj "/C=SE/ST=HL/O=Example, INC." -days 365 -out $SCRIPTS_DIR/$TLS_GENERATED_DIR/ca.cert
+      - openssl genrsa -out $SCRIPTS_DIR/$TLS_GENERATED_DIR/server.key 4096
+      - openssl req -new -key $SCRIPTS_DIR/$TLS_GENERATED_DIR/server.key -out $SCRIPTS_DIR/$TLS_GENERATED_DIR/server.csr -config $SCRIPTS_DIR/$TLS_DIR/certificate.conf
+      - openssl x509 -req -in $SCRIPTS_DIR/$TLS_GENERATED_DIR/server.csr -CA $SCRIPTS_DIR/$TLS_GENERATED_DIR/ca.cert -CAkey $SCRIPTS_DIR/$TLS_GENERATED_DIR/ca.key -CAcreateserial -out $SCRIPTS_DIR/$TLS_GENERATED_DIR/server.crt -days 365 -sha256 -extfile $SCRIPTS_DIR/$TLS_DIR/certificate.conf -extensions req_ext
+      - echo "SSL certificate generated."
+      - echo "Copying SSL certificate to tls directory..."
+      - cmd: Powershell.exe New-Item -Path $API_DIR/_generated/tls -ItemType Directory -ErrorAction SilentlyContinue
+        ignore_error: true
+      - Powershell.exe Copy-Item $SCRIPTS_DIR/$TLS_DIR/$GENERATED_DIR/server.crt -Destination $API_DIR/_generated/tls/server.crt
+      - Powershell.exe Copy-Item $SCRIPTS_DIR/$TLS_DIR/$GENERATED_DIR/server.key -Destination $API_DIR/_generated/tls/server.key

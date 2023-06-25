@@ -3,8 +3,8 @@ syntax = "proto3";
 package registry.v1;
 
 import "google/api/annotations.proto";
-import "google/api/field_behavior.proto";
-import "google/api/http.proto";
+//import "google/api/field_behavior.proto";
+//import "google/api/http.proto";
 
 service RegistryService {
   rpc AddSbom (AddSbomRequest) returns (AddSbomResponse) {

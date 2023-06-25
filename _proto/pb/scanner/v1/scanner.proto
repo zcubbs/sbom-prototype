@@ -3,8 +3,8 @@ syntax = "proto3";
 package scanner.v1;
 
 import "google/api/annotations.proto";
-import "google/api/field_behavior.proto";
-import "google/api/http.proto";
+//import "google/api/field_behavior.proto";
+//import "google/api/http.proto";
 
 service ScannerService {
   rpc AddScan (AddScanRequest) returns (AddScanResponse) {

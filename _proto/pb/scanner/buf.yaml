@@ -1,5 +1,5 @@
 version: v1
-name: buf.build/sbom-prototype/sbom
+name: buf.build/sbom-prototype/scanner
 deps:
   - buf.build/googleapis/googleapis
   - buf.build/grpc-ecosystem/grpc-gateway
@@ -7,12 +7,14 @@ breaking:
   use:
     - FILE
 lint:
-#  ignore:
-#    - third_party/google/api/annotations.proto
-#    - third_party/google/api/http.proto
-#    - third_party/google/api/field_behavior.proto
+  ignore:
+    - google/api/annotations.proto
+    - google/api/http.proto
+    - google/api/field_behavior.proto
   use:
     - DEFAULT
+  except:
+    - PACKAGE_DIRECTORY_MATCH
   rpc_allow_google_protobuf_empty_responses: true
 #build:
 #  excludes:

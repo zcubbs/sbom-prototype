@@ -1,5 +1,5 @@
 version: v1
-name: buf.build/sbom-prototype/sbom
+name: buf.build/sbom-prototype/registry
 deps:
   - buf.build/googleapis/googleapis
   - buf.build/grpc-ecosystem/grpc-gateway
@@ -13,6 +13,8 @@ lint:
 #    - third_party/google/api/field_behavior.proto
   use:
     - DEFAULT
+  except:
+    - PACKAGE_DIRECTORY_MATCH
   rpc_allow_google_protobuf_empty_responses: true
 #build:
 #  excludes:
