@@ -43,12 +43,16 @@ tasks:
 
   pb-clean-windows:
     cmds:
-      - cmd: Powershell.exe Remove-Item '.\cli\_gen' -Recurse -Force -ErrorAction SilentlyContinue
-        ignore_error: true
-      - cmd: Powershell.exe Remove-Item '.\registry\_gen' -Recurse -Force -ErrorAction SilentlyContinue
-        ignore_error: true
-      - cmd: Powershell.exe Remove-Item '.\scanner\_gen' -Recurse -Force -ErrorAction SilentlyContinue
-        ignore_error: true
+      - task: rmdir-windows
+        vars: { DIR_PATH: '.\scanner\_gen\go' }
+      - task: rmdir-windows
+        vars: { DIR_PATH: '.\registry\_gen\go' }
+      - task: rmdir-windows
+        vars: { DIR_PATH: '.\cli\_gen\go' }
+      - task: rmdir-windows
+        vars: { DIR_PATH: '.\scanner\_gen\swagger' }
+      - task: rmdir-windows
+        vars: { DIR_PATH: '.\registry\_gen\swagger' }
 
   pb-clean-darwin:
     cmds:
@@ -156,3 +160,18 @@ tasks:
     cmds:
       - cmd: Powershell.exe New-Item -Path {{ .DIR_PATH }} -ItemType Directory -ErrorAction SilentlyContinue
         ignore_error: true
+
+  rmdir-windows:
+    cmds:
+      - cmd: Powershell.exe Remove-Item {{ .DIR_PATH }} -Recurse -Force -ErrorAction SilentlyContinue
+        ignore_error: true
+
+  pg-up:
+    dir: "_dev/postgres"
+    cmds:
+      - cmd: docker-compose up -d
+
+  pg-down: ## task pb-down -- -v
+    dir: "_dev/postgres"
+    cmds:
+      - cmd: docker-compose down {{.CLI_ARGS}}
