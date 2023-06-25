@@ -1,28 +1,12 @@
-import {
-    Box,
-    Breadcrumbs, Container,
-    createStyles,
-    Flex,
-    Pagination,
-    Paper,
-    ScrollArea,
-    Select,
-    Space,
-    Table,
-    Text,
-    Title
-} from "@mantine/core";
-import Footer from "./Footer.jsx";
-import ScanScoreCell from "./ScanScoreCell.jsx";
-import {Link, useNavigate} from "react-router-dom";
+import {createStyles, Flex, Pagination, ScrollArea, Select, Space, Table, Text} from "@mantine/core";
+import {useNavigate} from "react-router-dom";
 import {useQuery} from "@tanstack/react-query";
 import {flexRender, getCoreRowModel, useReactTable} from '@tanstack/react-table'
-import {Fragment, useMemo, useState} from "react";
-import Filters from "../components/Filters.jsx";
+import {useMemo, useState} from "react";
 import {IconArrowDown, IconArrowUp} from "@tabler/icons-react";
-import {API_URL} from "../config/config.js";
+import {API_URL} from "../../../config/config.js";
 
-export const ScanJobsTable = () => {
+export const JobsTable = () => {
 
     const useStyles = createStyles((theme) => ({
         header: {

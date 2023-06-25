@@ -5,8 +5,7 @@ import * as React from "react";
 import {useState} from "react";
 import {Route, Routes} from "react-router-dom";
 import NotFound from "../views/NotFound.jsx";
-import Footer from "./Footer.jsx";
-import ScannerScanImageView from "../features/scanner/scan-image/ScannerScanImageView.jsx";
+import ScanView from "../views/ScanView.jsx";
 
 export default function AppShellComponent() {
     const theme = useMantineTheme();
@@ -35,8 +34,8 @@ export default function AppShellComponent() {
             }
         >
             <Routes>
-                <Route path="/" element={<ScannerScanImageView/>}/>
-                <Route path="/scans" element={<ScannerScanImageView/>}/>
+                <Route path="/" element={<ScanView/>}/>
+                <Route path="/scans" element={<ScanView/>}/>
                 <Route path="/registry" element={<NotFound/>}/>
             </Routes>
 

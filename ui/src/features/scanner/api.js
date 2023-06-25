@@ -1,5 +1,4 @@
 import axios from "axios";
-import {API_URL} from "../../../config/config.js";
 
 export const sendScanImage = async (image) => {
     const response = await axios

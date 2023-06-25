@@ -1,18 +1,10 @@
 import React, {Fragment} from 'react';
-import {Box, Button, Paper, Space, Text, Title} from "@mantine/core";
-import {sendScanImage} from "./api.js";
-import {ScanJobsTable} from "../../../components/ScanJobsTable.jsx";
+import {Box, Paper, Space, Text, Title} from "@mantine/core";
 import {Link} from "react-router-dom";
-import Filters from "../../../components/Filters.jsx";
+import RunScanForm from "../features/scanner/scan-image/RunScanForm.jsx";
+import {JobsTable} from "../features/scanner/list-jobs/JobsTable.jsx";
 
-const ScannerScanImageView = () => {
-
-    const runScan = () => {
-        sendScanImage("test")
-            .then(r => console.log(r))
-            .catch(e => console.log(e));
-    }
-
+const ScanView = () => {
     const breadcrumbs = [
         {title: 'Scans', href: '/scans'},
         {title: 'Jobs', href: '/scans'},
@@ -30,18 +22,15 @@ const ScannerScanImageView = () => {
                 </Paper>
 
                 <Paper padding="md" radius={0} style={{padding: "30px"}}>
-                    <Button onClick={runScan}>
-                        Run Scan
-                    </Button>
-                    {/*<Filters onChange={onFilterChange}/>*/}
+                    <RunScanForm />
                 </Paper>
 
                 <Space h="xl"/>
 
-                <ScanJobsTable />
+                <JobsTable />
             </Box>
         </Fragment>
     );
-}
+};
 
-export default ScannerScanImageView;
+export default ScanView;
