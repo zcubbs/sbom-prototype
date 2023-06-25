@@ -1,1 +1,1 @@
-drop table if exists public.scan;
+drop table if exists scan;

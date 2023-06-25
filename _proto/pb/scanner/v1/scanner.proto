@@ -43,11 +43,17 @@ message Scan {
   int32 vulnerability_count = 6;
   string image = 7;
   string sbom = 8;
+  string artifact_id = 9;
+  string artifact_name = 10;
+  string artifact_version = 11;
 }
 
 message Pagination {
   int32 count = 1;
   int32 pages = 2;
+  int32 current = 3;
+  int32 next = 4;
+  int32 prev = 5;
 }
 
 message AddScanImageRequest {
@@ -68,8 +74,6 @@ message AddScanSbomResponse {
 
 message GetScanRequest {
   string uuid = 1;
-  int64 limit = 2;
-  int64 offset = 3;
 }
 
 message GetScanResponse {
@@ -77,9 +81,8 @@ message GetScanResponse {
 }
 
 message GetScansRequest {
-  int32 start = 1;
-  int32 end = 2;
-  string limit = 3;
+  int32 limit = 1;
+  int32 page = 3;
 }
 
 message GetScansResponse {

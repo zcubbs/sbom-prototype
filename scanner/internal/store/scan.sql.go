@@ -8,23 +8,62 @@ package store
 import (
 	"context"
 	"database/sql"
+	"time"
 
 	"github.com/google/uuid"
 )
 
+const countScans = `-- name: CountScans :one
+SELECT count(*) FROM scan
+`
+
+func (q *Queries) CountScans(ctx context.Context) (int64, error) {
+	row := q.queryRow(ctx, q.countScansStmt, countScans)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const createScan = `-- name: CreateScan :one
-INSERT INTO scan (id, uuid)
-values ($1, $2)
-RETURNING id, uuid, created_at, updated_at, image, status, sbom, report
+INSERT INTO scan (
+                  uuid,
+                  image,
+                  sbom,
+                  status,
+                  artifact_id,
+                  artifact_name,
+                  artifact_version,
+                  created_at,
+                  updated_at
+                  )
+values ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+RETURNING id, uuid, created_at, updated_at, image, status, sbom, report, artifact_id, artifact_name, artifact_version
 `
 
 type CreateScanParams struct {
-	ID   sql.NullInt32 `json:"id"`
-	Uuid uuid.UUID     `json:"uuid"`
+	Uuid            uuid.UUID      `json:"uuid"`
+	Image           string         `json:"image"`
+	Sbom            sql.NullString `json:"sbom"`
+	Status          string         `json:"status"`
+	ArtifactID      uuid.NullUUID  `json:"artifact_id"`
+	ArtifactName    sql.NullString `json:"artifact_name"`
+	ArtifactVersion sql.NullString `json:"artifact_version"`
+	CreatedAt       time.Time      `json:"created_at"`
+	UpdatedAt       time.Time      `json:"updated_at"`
 }
 
 func (q *Queries) CreateScan(ctx context.Context, arg CreateScanParams) (Scan, error) {
-	row := q.queryRow(ctx, q.createScanStmt, createScan, arg.ID, arg.Uuid)
+	row := q.queryRow(ctx, q.createScanStmt, createScan,
+		arg.Uuid,
+		arg.Image,
+		arg.Sbom,
+		arg.Status,
+		arg.ArtifactID,
+		arg.ArtifactName,
+		arg.ArtifactVersion,
+		arg.CreatedAt,
+		arg.UpdatedAt,
+	)
 	var i Scan
 	err := row.Scan(
 		&i.ID,
@@ -35,6 +74,9 @@ func (q *Queries) CreateScan(ctx context.Context, arg CreateScanParams) (Scan, e
 		&i.Status,
 		&i.Sbom,
 		&i.Report,
+		&i.ArtifactID,
+		&i.ArtifactName,
+		&i.ArtifactVersion,
 	)
 	return i, err
 }
@@ -62,7 +104,7 @@ func (q *Queries) DeleteScanByUUID(ctx context.Context, argUuid uuid.UUID) error
 }
 
 const getScanById = `-- name: GetScanById :one
-SELECT id, uuid, created_at, updated_at, image, status, sbom, report
+SELECT id, uuid, created_at, updated_at, image, status, sbom, report, artifact_id, artifact_name, artifact_version
 FROM scan
 WHERE id = $1
 `
@@ -79,12 +121,15 @@ func (q *Queries) GetScanById(ctx context.Context, id sql.NullInt32) (Scan, erro
 		&i.Status,
 		&i.Sbom,
 		&i.Report,
+		&i.ArtifactID,
+		&i.ArtifactName,
+		&i.ArtifactVersion,
 	)
 	return i, err
 }
 
 const getScanByUUID = `-- name: GetScanByUUID :one
-SELECT id, uuid, created_at, updated_at, image, status, sbom, report
+SELECT id, uuid, created_at, updated_at, image, status, sbom, report, artifact_id, artifact_name, artifact_version
 FROM scan
 WHERE uuid = $1
 `
@@ -101,12 +146,15 @@ func (q *Queries) GetScanByUUID(ctx context.Context, argUuid uuid.UUID) (Scan, e
 		&i.Status,
 		&i.Sbom,
 		&i.Report,
+		&i.ArtifactID,
+		&i.ArtifactName,
+		&i.ArtifactVersion,
 	)
 	return i, err
 }
 
 const getScans = `-- name: GetScans :many
-SELECT id, uuid, created_at, updated_at, image, status, sbom, report
+SELECT id, uuid, created_at, updated_at, image, status, sbom, report, artifact_id, artifact_name, artifact_version
 FROM scan
 ORDER BY created_at desc
 LIMIT $1 OFFSET $2
@@ -135,6 +183,9 @@ func (q *Queries) GetScans(ctx context.Context, arg GetScansParams) ([]Scan, err
 			&i.Status,
 			&i.Sbom,
 			&i.Report,
+			&i.ArtifactID,
+			&i.ArtifactName,
+			&i.ArtifactVersion,
 		); err != nil {
 			return nil, err
 		}

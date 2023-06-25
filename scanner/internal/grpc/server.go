@@ -13,6 +13,7 @@ import (
 	"time"
 	pb "zel/sbom-prototype/scanner/_gen/go/v1"
 	"zel/sbom-prototype/scanner/internal/config"
+	"zel/sbom-prototype/scanner/internal/handler"
 )
 
 type Scanner struct {
@@ -23,9 +24,19 @@ func NewServer(l logger.Logger) *Scanner {
 	return &Scanner{l}
 }
 
-func (s *Scanner) AddScanImage(_ context.Context, req *pb.AddScanImageRequest) (*pb.AddScanImageResponse, error) {
+func (s *Scanner) AddScanImage(ctx context.Context, req *pb.AddScanImageRequest) (*pb.AddScanImageResponse, error) {
 	s.log.Infof("Handle AddScanImage request for %s", req.Image)
-	return &pb.AddScanImageResponse{ReportId: "1"}, nil
+	h := handler.New(s.log, config.Conn, ctx)
+	uid, err := h.ScheduleScan(req.Image)
+	if err != nil {
+		return nil, err
+	}
+
+	s.log.Infof("scheduled job id: %+v\n", uid)
+
+	return &pb.AddScanImageResponse{
+		ReportId: uid,
+	}, nil
 }
 
 func (s *Scanner) AddScanSbom(_ context.Context, req *pb.AddScanSbomRequest) (*pb.AddScanSbomResponse, error) {
@@ -48,41 +59,34 @@ func (s *Scanner) GetScan(_ context.Context, req *pb.GetScanRequest) (*pb.GetSca
 	}, nil
 }
 
-func (s *Scanner) GetScans(_ context.Context, req *pb.GetScansRequest) (*pb.GetScansResponse, error) {
-	s.log.Infof("Handle GetScans request from start=%s to end=%s", req.Start, req.End)
+func (s *Scanner) GetScans(ctx context.Context, req *pb.GetScansRequest) (*pb.GetScansResponse, error) {
+	s.log.Infof("Handle GetScans request req=%+v", req)
+
+	h := handler.New(s.log, config.Conn, ctx)
+
+	response, err := h.GetScans(req.Limit, req.Page)
+	if err != nil {
+		return nil, err
+	}
+
+	parsedScans := make([]*pb.Scan, len(response.Scans))
+	for i, scan := range response.Scans {
+		parsedScans[i] = &pb.Scan{
+			Uuid:            scan.Uuid,
+			Image:           scan.Image,
+			Sbom:            scan.Sbom,
+			Vulnerabilities: nil,
+			Status:          scan.Status,
+			CreatedAt:       scan.CreatedAt.Format(time.ANSIC),
+			UpdatedAt:       scan.UpdatedAt.Format(time.ANSIC),
+		}
+	}
 
 	return &pb.GetScansResponse{
-		Scans: []*pb.Scan{
-			{
-				Uuid:  uuid.New().String(),
-				Image: "test-image",
-				Sbom:  "",
-				Vulnerabilities: []string{
-					"vul-01",
-					"vul-02",
-				},
-				VulnerabilityCount: 5,
-				Status:             "pending",
-				CreatedAt:          time.Now().Format(time.ANSIC),
-				UpdatedAt:          time.Now().Format(time.ANSIC),
-			},
-			{
-				Uuid:  uuid.New().String(),
-				Image: "test-image2",
-				Sbom:  "",
-				Vulnerabilities: []string{
-					"vul-01",
-					"vul-25",
-				},
-				VulnerabilityCount: 12,
-				Status:             "pending",
-				CreatedAt:          time.Now().Format(time.ANSIC),
-				UpdatedAt:          time.Now().Format(time.ANSIC),
-			},
-		},
+		Scans: parsedScans,
 		Pagination: &pb.Pagination{
-			Count: 1,
-			Pages: 1,
+			Count: response.Count,
+			Pages: response.Pages,
 		},
 	}, nil
 }

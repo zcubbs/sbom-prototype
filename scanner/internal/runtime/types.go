@@ -1,4 +1,4 @@
-package scan
+package runtime
 
 type Vulnerability struct {
 	VulnerabilityMetadata

@@ -1,4 +1,4 @@
-package scan
+package runtime
 
 import (
 	"context"
@@ -36,7 +36,7 @@ type registryInfo struct {
 	RegistryEmail    string
 }
 
-func NewRuntime(ctx context.Context) (*Runtime, error) {
+func New(ctx context.Context) (*Runtime, error) {
 	c, err := getDefaultDaggerClient(ctx)
 	if err != nil {
 		return nil, err

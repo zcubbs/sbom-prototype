@@ -1,6 +1,16 @@
 -- name: CreateScan :one
-INSERT INTO scan (id, uuid)
-values ($1, $2)
+INSERT INTO scan (
+                  uuid,
+                  image,
+                  sbom,
+                  status,
+                  artifact_id,
+                  artifact_name,
+                  artifact_version,
+                  created_at,
+                  updated_at
+                  )
+values ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 RETURNING *;
 
 -- name: GetScanByUUID :one
@@ -29,4 +39,5 @@ FROM scan
 ORDER BY created_at desc
 LIMIT $1 OFFSET $2;
 
-
+-- name: CountScans :one
+SELECT count(*) FROM scan;

@@ -7,12 +7,15 @@ import (
 	"github.com/zcubbs/zlogger/pkg/logger"
 )
 
+var Conn *sql.DB
+
 func GetDbConnection(config DatabaseConfig) (*sql.DB, error) {
 	if config.Postgres.Enabled {
 		conn, err := connectToPostgres(config.Postgres)
 		if err != nil {
 			return nil, err
 		}
+		Conn = conn
 		return conn, nil
 	}
 

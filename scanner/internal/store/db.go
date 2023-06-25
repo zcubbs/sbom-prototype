@@ -24,6 +24,9 @@ func New(db DBTX) *Queries {
 func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	q := Queries{db: db}
 	var err error
+	if q.countScansStmt, err = db.PrepareContext(ctx, countScans); err != nil {
+		return nil, fmt.Errorf("error preparing query CountScans: %w", err)
+	}
 	if q.createScanStmt, err = db.PrepareContext(ctx, createScan); err != nil {
 		return nil, fmt.Errorf("error preparing query CreateScan: %w", err)
 	}
@@ -47,6 +50,11 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 
 func (q *Queries) Close() error {
 	var err error
+	if q.countScansStmt != nil {
+		if cerr := q.countScansStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing countScansStmt: %w", cerr)
+		}
+	}
 	if q.createScanStmt != nil {
 		if cerr := q.createScanStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing createScanStmt: %w", cerr)
@@ -116,6 +124,7 @@ func (q *Queries) queryRow(ctx context.Context, stmt *sql.Stmt, query string, ar
 type Queries struct {
 	db                   DBTX
 	tx                   *sql.Tx
+	countScansStmt       *sql.Stmt
 	createScanStmt       *sql.Stmt
 	deleteScanByIdStmt   *sql.Stmt
 	deleteScanByUUIDStmt *sql.Stmt
@@ -128,6 +137,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 	return &Queries{
 		db:                   tx,
 		tx:                   tx,
+		countScansStmt:       q.countScansStmt,
 		createScanStmt:       q.createScanStmt,
 		deleteScanByIdStmt:   q.deleteScanByIdStmt,
 		deleteScanByUUIDStmt: q.deleteScanByUUIDStmt,

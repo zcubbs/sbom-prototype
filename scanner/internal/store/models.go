@@ -12,12 +12,15 @@ import (
 )
 
 type Scan struct {
-	ID        sql.NullInt32  `json:"id"`
-	Uuid      uuid.UUID      `json:"uuid"`
-	CreatedAt time.Time      `json:"created_at"`
-	UpdatedAt time.Time      `json:"updated_at"`
-	Image     string         `json:"image"`
-	Status    string         `json:"status"`
-	Sbom      sql.NullString `json:"sbom"`
-	Report    sql.NullString `json:"report"`
+	ID              sql.NullInt32  `json:"id"`
+	Uuid            uuid.UUID      `json:"uuid"`
+	CreatedAt       time.Time      `json:"created_at"`
+	UpdatedAt       time.Time      `json:"updated_at"`
+	Image           string         `json:"image"`
+	Status          string         `json:"status"`
+	Sbom            sql.NullString `json:"sbom"`
+	Report          sql.NullString `json:"report"`
+	ArtifactID      uuid.NullUUID  `json:"artifact_id"`
+	ArtifactName    sql.NullString `json:"artifact_name"`
+	ArtifactVersion sql.NullString `json:"artifact_version"`
 }

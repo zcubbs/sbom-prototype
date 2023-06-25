@@ -7,11 +7,11 @@ create table if not exists scan
     image     text     not null,
     status    text    not null default 'pending',
     sbom      text,
-    report    text
+    report    text,
+    artifact_id uuid,
+    artifact_name text,
+    artifact_version text
 );
-
-alter table scan
-    owner to postgres;
 
 create index if not exists scan_pk_index
     on scan (id);
