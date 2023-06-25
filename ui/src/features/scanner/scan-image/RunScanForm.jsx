@@ -25,8 +25,8 @@ const RunScanForm = () => {
             <Grid>
                 <Grid.Col span={4}>
                     <TextInput
-                        label="Image"
-                        placeholder="ubuntu:latest"
+                        label="Select a new image to schedule for a scan:"
+                        placeholder="example: 'ubuntu:latest'"
                         {...form.getInputProps('image')}
                     />
                 </Grid.Col>
