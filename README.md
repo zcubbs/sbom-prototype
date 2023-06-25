@@ -2,6 +2,8 @@
 
 ## Setup
 
+> prerequisite: docker, go, taskfile
+
 ```
 task bootstrap
 task pb
