@@ -35,13 +35,13 @@ func (s *Scanner) AddScanImage(ctx context.Context, req *pb.AddScanImageRequest)
 	s.log.Infof("scheduled job id: %+v\n", uid)
 
 	return &pb.AddScanImageResponse{
-		ReportId: uid,
+		JobId: uid,
 	}, nil
 }
 
 func (s *Scanner) AddScanSbom(_ context.Context, req *pb.AddScanSbomRequest) (*pb.AddScanSbomResponse, error) {
 	s.log.Infof("Handle AddScanSbom request for %s", req.Sbom)
-	return &pb.AddScanSbomResponse{ReportId: "1"}, nil
+	return &pb.AddScanSbomResponse{JobId: "1"}, nil
 }
 
 func (s *Scanner) GetScan(_ context.Context, req *pb.GetScanRequest) (*pb.GetScanResponse, error) {
@@ -49,12 +49,16 @@ func (s *Scanner) GetScan(_ context.Context, req *pb.GetScanRequest) (*pb.GetSca
 	return &pb.GetScanResponse{
 		Scan: &pb.Scan{
 			Uuid:            uuid.New().String(),
+			Status:          "",
+			CreatedAt:       "",
+			UpdatedAt:       "",
 			Image:           "test-image",
-			Sbom:            "",
-			Vulnerabilities: nil,
-			Status:          "pending",
-			CreatedAt:       time.Now().Format(time.ANSIC),
-			UpdatedAt:       time.Now().Format(time.ANSIC),
+			ImageTag:        "",
+			SbomId:          "",
+			ArtifactId:      "",
+			ArtifactName:    "",
+			ArtifactVersion: "",
+			Report:          nil,
 		},
 	}, nil
 }
@@ -73,12 +77,16 @@ func (s *Scanner) GetScans(ctx context.Context, req *pb.GetScansRequest) (*pb.Ge
 	for i, scan := range response.Scans {
 		parsedScans[i] = &pb.Scan{
 			Uuid:            scan.Uuid,
-			Image:           scan.Image,
-			Sbom:            scan.Sbom,
-			Vulnerabilities: nil,
 			Status:          scan.Status,
-			CreatedAt:       scan.CreatedAt.Format(time.ANSIC),
-			UpdatedAt:       scan.UpdatedAt.Format(time.ANSIC),
+			CreatedAt:       scan.CreatedAt.Format(time.RFC3339),
+			UpdatedAt:       scan.UpdatedAt.Format(time.RFC3339),
+			Image:           scan.Image,
+			ImageTag:        scan.Image,
+			SbomId:          scan.SbomID,
+			ArtifactId:      scan.ArtifactID,
+			ArtifactName:    scan.ArtifactName,
+			ArtifactVersion: scan.ArtifactVersion,
+			Report:          nil,
 		}
 	}
 
@@ -89,6 +97,11 @@ func (s *Scanner) GetScans(ctx context.Context, req *pb.GetScansRequest) (*pb.Ge
 			Pages: response.Pages,
 		},
 	}, nil
+}
+
+func (s *Scanner) RetryScan(context.Context, *pb.RetryScanRequest) (*pb.RetryScanResponse, error) {
+
+	return &pb.RetryScanResponse{}, nil
 }
 
 func StartGrpcServer(cfg config.GrpcServer) {

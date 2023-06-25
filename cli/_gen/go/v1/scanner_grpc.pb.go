@@ -26,6 +26,7 @@ type ScannerServiceClient interface {
 	AddScanSbom(ctx context.Context, in *AddScanSbomRequest, opts ...grpc.CallOption) (*AddScanSbomResponse, error)
 	GetScan(ctx context.Context, in *GetScanRequest, opts ...grpc.CallOption) (*GetScanResponse, error)
 	GetScans(ctx context.Context, in *GetScansRequest, opts ...grpc.CallOption) (*GetScansResponse, error)
+	RetryScan(ctx context.Context, in *RetryScanRequest, opts ...grpc.CallOption) (*RetryScanResponse, error)
 }
 
 type scannerServiceClient struct {
@@ -72,6 +73,15 @@ func (c *scannerServiceClient) GetScans(ctx context.Context, in *GetScansRequest
 	return out, nil
 }
 
+func (c *scannerServiceClient) RetryScan(ctx context.Context, in *RetryScanRequest, opts ...grpc.CallOption) (*RetryScanResponse, error) {
+	out := new(RetryScanResponse)
+	err := c.cc.Invoke(ctx, "/scanner.v1.ScannerService/RetryScan", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ScannerServiceServer is the server API for ScannerService service.
 // All implementations should embed UnimplementedScannerServiceServer
 // for forward compatibility
@@ -80,6 +90,7 @@ type ScannerServiceServer interface {
 	AddScanSbom(context.Context, *AddScanSbomRequest) (*AddScanSbomResponse, error)
 	GetScan(context.Context, *GetScanRequest) (*GetScanResponse, error)
 	GetScans(context.Context, *GetScansRequest) (*GetScansResponse, error)
+	RetryScan(context.Context, *RetryScanRequest) (*RetryScanResponse, error)
 }
 
 // UnimplementedScannerServiceServer should be embedded to have forward compatible implementations.
@@ -97,6 +108,9 @@ func (UnimplementedScannerServiceServer) GetScan(context.Context, *GetScanReques
 }
 func (UnimplementedScannerServiceServer) GetScans(context.Context, *GetScansRequest) (*GetScansResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetScans not implemented")
+}
+func (UnimplementedScannerServiceServer) RetryScan(context.Context, *RetryScanRequest) (*RetryScanResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RetryScan not implemented")
 }
 
 // UnsafeScannerServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -182,6 +196,24 @@ func _ScannerService_GetScans_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ScannerService_RetryScan_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RetryScanRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ScannerServiceServer).RetryScan(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/scanner.v1.ScannerService/RetryScan",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ScannerServiceServer).RetryScan(ctx, req.(*RetryScanRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ScannerService_ServiceDesc is the grpc.ServiceDesc for ScannerService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -204,6 +236,10 @@ var ScannerService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetScans",
 			Handler:    _ScannerService_GetScans_Handler,
+		},
+		{
+			MethodName: "RetryScan",
+			Handler:    _ScannerService_RetryScan_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

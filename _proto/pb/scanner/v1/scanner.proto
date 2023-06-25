@@ -32,6 +32,12 @@ service ScannerService {
       get: "/v1/scans"
     };
   }
+
+  rpc RetryScan (RetryScanRequest) returns (RetryScanResponse) {
+    option (google.api.http) = {
+      post: "/v1/scan/{uuid}/retry"
+    };
+  }
 }
 
 message Scan {
@@ -39,13 +45,13 @@ message Scan {
   string status = 2;
   string created_at = 3;
   string updated_at = 4;
-  repeated string vulnerabilities = 5;
-  int32 vulnerability_count = 6;
   string image = 7;
-  string sbom = 8;
-  string artifact_id = 9;
-  string artifact_name = 10;
-  string artifact_version = 11;
+  string image_tag = 8;
+  string sbom_id = 9;
+  string artifact_id = 10;
+  string artifact_name = 11;
+  string artifact_version = 12;
+  ScanReport report = 13;
 }
 
 message Pagination {
@@ -61,7 +67,8 @@ message AddScanImageRequest {
 }
 
 message AddScanImageResponse {
-  string report_id = 1;
+  string job_id = 1;
+  string status_code = 2;
 }
 
 message AddScanSbomRequest {
@@ -69,7 +76,8 @@ message AddScanSbomRequest {
 }
 
 message AddScanSbomResponse {
-  string report_id = 1;
+  string job_id = 1;
+  string status_code = 2;
 }
 
 message GetScanRequest {
@@ -93,5 +101,32 @@ message GetScansResponse {
 message ScanReport {
   string uuid = 1;
   string image = 2;
-  repeated string vulnerabilities = 3;
+  string created_at = 3;
+  int32 vulnerability_count = 4;
+  int32 critical_count = 5;
+  int32 high_count = 6;
+  int32 medium_count = 7;
+  int32 low_count = 8;
+  repeated ScanReportVulnerability vulnerabilities = 9;
+}
+
+message ScanReportVulnerability {
+  string id = 1;
+  string name = 2;
+  string severity = 3;
+  string link = 4;
+  string description = 5;
+  string fixed_version = 6;
+  string package = 7;
+  string package_version = 8;
+  string package_type = 9;
+  string package_path = 10;
+}
+
+message RetryScanRequest {
+  string uuid = 1;
+}
+
+message RetryScanResponse {
+  string report_id = 1;
 }

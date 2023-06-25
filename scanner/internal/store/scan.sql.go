@@ -28,7 +28,8 @@ const createScan = `-- name: CreateScan :one
 INSERT INTO scan (
                   uuid,
                   image,
-                  sbom,
+                  image_tag,
+                  sbom_id,
                   status,
                   artifact_id,
                   artifact_name,
@@ -36,14 +37,15 @@ INSERT INTO scan (
                   created_at,
                   updated_at
                   )
-values ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-RETURNING id, uuid, created_at, updated_at, image, status, sbom, report, artifact_id, artifact_name, artifact_version
+values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+RETURNING id, uuid, created_at, updated_at, image, image_tag, status, sbom_id, report, artifact_id, artifact_name, artifact_version
 `
 
 type CreateScanParams struct {
 	Uuid            uuid.UUID      `json:"uuid"`
 	Image           string         `json:"image"`
-	Sbom            sql.NullString `json:"sbom"`
+	ImageTag        string         `json:"image_tag"`
+	SbomID          sql.NullString `json:"sbom_id"`
 	Status          string         `json:"status"`
 	ArtifactID      uuid.NullUUID  `json:"artifact_id"`
 	ArtifactName    sql.NullString `json:"artifact_name"`
@@ -56,7 +58,8 @@ func (q *Queries) CreateScan(ctx context.Context, arg CreateScanParams) (Scan, e
 	row := q.queryRow(ctx, q.createScanStmt, createScan,
 		arg.Uuid,
 		arg.Image,
-		arg.Sbom,
+		arg.ImageTag,
+		arg.SbomID,
 		arg.Status,
 		arg.ArtifactID,
 		arg.ArtifactName,
@@ -71,8 +74,9 @@ func (q *Queries) CreateScan(ctx context.Context, arg CreateScanParams) (Scan, e
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.Image,
+		&i.ImageTag,
 		&i.Status,
-		&i.Sbom,
+		&i.SbomID,
 		&i.Report,
 		&i.ArtifactID,
 		&i.ArtifactName,
@@ -104,7 +108,7 @@ func (q *Queries) DeleteScanByUUID(ctx context.Context, argUuid uuid.UUID) error
 }
 
 const getScanById = `-- name: GetScanById :one
-SELECT id, uuid, created_at, updated_at, image, status, sbom, report, artifact_id, artifact_name, artifact_version
+SELECT id, uuid, created_at, updated_at, image, image_tag, status, sbom_id, report, artifact_id, artifact_name, artifact_version
 FROM scan
 WHERE id = $1
 `
@@ -118,8 +122,9 @@ func (q *Queries) GetScanById(ctx context.Context, id sql.NullInt32) (Scan, erro
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.Image,
+		&i.ImageTag,
 		&i.Status,
-		&i.Sbom,
+		&i.SbomID,
 		&i.Report,
 		&i.ArtifactID,
 		&i.ArtifactName,
@@ -129,7 +134,7 @@ func (q *Queries) GetScanById(ctx context.Context, id sql.NullInt32) (Scan, erro
 }
 
 const getScanByUUID = `-- name: GetScanByUUID :one
-SELECT id, uuid, created_at, updated_at, image, status, sbom, report, artifact_id, artifact_name, artifact_version
+SELECT id, uuid, created_at, updated_at, image, image_tag, status, sbom_id, report, artifact_id, artifact_name, artifact_version
 FROM scan
 WHERE uuid = $1
 `
@@ -143,8 +148,9 @@ func (q *Queries) GetScanByUUID(ctx context.Context, argUuid uuid.UUID) (Scan, e
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.Image,
+		&i.ImageTag,
 		&i.Status,
-		&i.Sbom,
+		&i.SbomID,
 		&i.Report,
 		&i.ArtifactID,
 		&i.ArtifactName,
@@ -154,7 +160,7 @@ func (q *Queries) GetScanByUUID(ctx context.Context, argUuid uuid.UUID) (Scan, e
 }
 
 const getScans = `-- name: GetScans :many
-SELECT id, uuid, created_at, updated_at, image, status, sbom, report, artifact_id, artifact_name, artifact_version
+SELECT id, uuid, created_at, updated_at, image, image_tag, status, sbom_id, report, artifact_id, artifact_name, artifact_version
 FROM scan
 ORDER BY created_at desc
 LIMIT $1 OFFSET $2
@@ -180,8 +186,9 @@ func (q *Queries) GetScans(ctx context.Context, arg GetScansParams) ([]Scan, err
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.Image,
+			&i.ImageTag,
 			&i.Status,
-			&i.Sbom,
+			&i.SbomID,
 			&i.Report,
 			&i.ArtifactID,
 			&i.ArtifactName,

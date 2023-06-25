@@ -35,7 +35,7 @@ func (h *Handler) ScheduleScan(image string) (scheduleUuid string, err error) {
 	scan, err := s.CreateScan(h.ctx, store.CreateScanParams{
 		Uuid:            uuid.New(),
 		Image:           image,
-		Sbom:            sql.NullString{},
+		SbomID:          sql.NullString{},
 		Status:          "pending",
 		ArtifactID:      uuid.NullUUID{},
 		ArtifactName:    sql.NullString{},
@@ -101,7 +101,8 @@ func (h *Handler) RunScan(image string) (response *RunScanResponse, err error) {
 type GetScanResponse struct {
 	Uuid            string
 	Image           string
-	Sbom            string
+	ImageTag        string
+	SbomID          string
 	Status          string
 	ArtifactID      string
 	ArtifactName    string
@@ -148,7 +149,7 @@ func (h *Handler) GetScans(limit, page int32) (response *GetScansResponse, err e
 		scansResponse = append(scansResponse, &GetScanResponse{
 			Uuid:            scan.Uuid.String(),
 			Image:           scan.Image,
-			Sbom:            scan.Sbom.String,
+			SbomID:          scan.SbomID.String,
 			Status:          scan.Status,
 			ArtifactID:      scan.ArtifactID.UUID.String(),
 			ArtifactName:    scan.ArtifactName.String,

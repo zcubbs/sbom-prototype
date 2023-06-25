@@ -2,7 +2,8 @@
 INSERT INTO scan (
                   uuid,
                   image,
-                  sbom,
+                  image_tag,
+                  sbom_id,
                   status,
                   artifact_id,
                   artifact_name,
@@ -10,7 +11,7 @@ INSERT INTO scan (
                   created_at,
                   updated_at
                   )
-values ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
 RETURNING *;
 
 -- name: GetScanByUUID :one

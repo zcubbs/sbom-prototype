@@ -17,8 +17,9 @@ type Scan struct {
 	CreatedAt       time.Time      `json:"created_at"`
 	UpdatedAt       time.Time      `json:"updated_at"`
 	Image           string         `json:"image"`
+	ImageTag        string         `json:"image_tag"`
 	Status          string         `json:"status"`
-	Sbom            sql.NullString `json:"sbom"`
+	SbomID          sql.NullString `json:"sbom_id"`
 	Report          sql.NullString `json:"report"`
 	ArtifactID      uuid.NullUUID  `json:"artifact_id"`
 	ArtifactName    sql.NullString `json:"artifact_name"`

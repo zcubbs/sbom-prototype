@@ -1,41 +1,20 @@
-import {createStyles, Flex, Pagination, ScrollArea, Select, Space, Table, Text} from "@mantine/core";
+import {ScrollArea, Space} from "@mantine/core";
 import {useNavigate} from "react-router-dom";
 import {useQuery} from "@tanstack/react-query";
-import {flexRender, getCoreRowModel, useReactTable} from '@tanstack/react-table'
+import {createColumnHelper, getCoreRowModel, useReactTable} from '@tanstack/react-table'
 import {useMemo, useState} from "react";
-import {IconArrowDown, IconArrowUp} from "@tabler/icons-react";
 import {API_URL} from "../../../config/config.js";
+import PaginationWrapper from "../../../components/PaginationWrapper.jsx";
+import TableWrapper from "../../../components/TableWrapper.jsx";
+import ScanScoreCell from "./ScanScoreCell.jsx";
+import ScanJobStatusCell from "./ScanJobStatusCell.jsx";
 
 export const JobsTable = () => {
-
-    const useStyles = createStyles((theme) => ({
-        header: {
-            position: 'sticky',
-            top: 0,
-            backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[7] : theme.white,
-            transition: 'box-shadow 150ms ease',
-
-            '&::after': {
-                content: '""',
-                position: 'absolute',
-                left: 0,
-                right: 0,
-                bottom: 0,
-                borderBottom: `1px solid ${
-                    theme.colorScheme === 'dark' ? theme.colors.dark[3] : theme.colors.gray[2]
-                }`,
-            },
-        },
-
-        scrolled: {
-            boxShadow: theme.shadows.sm,
-        },
-    }));
-
-    const {classes, cx} = useStyles();
     const [scrolled, setScrolled] = useState(false);
 
     const navigate = useNavigate();
+
+    const columnHelper = createColumnHelper();
 
     const [{pageIndex, pageSize}, setPagination] = useState({
         pageIndex: 0,
@@ -76,12 +55,6 @@ export const JobsTable = () => {
                     'Content-Type': 'application/json',
                 },
                 method: 'GET',
-                // body: JSON.stringify(
-                //     {
-                //         image: image,
-                //         score_greater_than: scoreGreaterThan,
-                //     }
-                // )
             });
         return response.json();
     };
@@ -119,29 +92,33 @@ export const JobsTable = () => {
             header: "Status",
             accessorKey: "status",
             id: "status",
+            cell: ScanJobStatusCell,
+            size: 40,
         },
         {
             header: "Job Id",
             accessorKey: "uuid",
             id: "id",
+            size: 350,
+        },
+        {
+            header: "Risk Score",
+            accessorKey: "risk_score",
+            id: "risk_score",
+            cell: ScanScoreCell,
+            size: 80,
+        },
+        {
+            header: "Vulnerabilities",
+            accessorKey: "vulnerabilityCount",
+            id: "vulnerability_count",
+            size: 100,
         },
         {
             header: "Image",
             accessorKey: "image",
             id: "image",
         },
-        {
-            header: "Vulnerability Count",
-            accessorKey: "vulnerabilityCount",
-            id: "vulnerability_count",
-        },
-        // {
-        //     header: "Score",
-        //     accessorKey: "score",
-        //     id: "score",
-        //     cell: ScanScoreCell,
-        // }
-
     ]);
 
     const tableHooks = (hooks) => {
@@ -172,7 +149,6 @@ export const JobsTable = () => {
             getCoreRowModel: getCoreRowModel(),
             manualPagination: true,
             debugTable: true,
-
             tableHooks,
         },
     )
@@ -188,97 +164,13 @@ export const JobsTable = () => {
     return (
         <>
             <ScrollArea sx={{height: "auto"}} onScrollPositionChange={({y}) => setScrolled(y !== 0)}>
-                <Table striped highlightOnHover withBorder withColumnBorders horizontalSpacing="lg"
-                       verticalSpacing="xs"
-                       fontSize="sm"
-                       sx={{minWidth: 700}}
-                >
-                    <thead className={cx(classes.header, {[classes.scrolled]: scrolled})}>
-                    {table.getHeaderGroups().map(headerGroup => (
-                        <tr key={headerGroup.id}>
-                            {headerGroup.headers.map(header => {
-                                return (
-                                    <th key={header.id} colSpan={header.colSpan}>
-                                        {header.isPlaceholder ? null : (
-                                            <div>
-                                                {flexRender(
-                                                    header.column.columnDef.header,
-                                                    header.getContext()
-                                                )}
-
-                                                {header.isSorted ? (
-                                                    header.isSortedDesc ? (
-                                                        <IconArrowDown
-                                                            name="arrow-down"
-                                                            size="sm"
-                                                            color="primary"
-                                                            ml="xs"
-                                                        />
-                                                    ) : (
-                                                        <IconArrowUp
-                                                            name="arrow-up"
-                                                            size="sm"
-                                                            color="primary"
-                                                            ml="xs"
-                                                        />
-                                                    )
-                                                ) : null}
-                                            </div>
-                                        )}
-                                    </th>
-                                )
-                            })}
-                        </tr>
-                    ))}
-                    </thead>
-                    <tbody>
-                    {table.getRowModel().rows.map(row => {
-                        return (
-                            <tr key={row.id} style={{cursor: "pointer"}}>
-                                {row.getVisibleCells().map(cell => {
-                                    return (
-                                        <td key={cell.id}>
-                                            {flexRender(
-                                                cell.column.columnDef.cell,
-                                                cell.getContext()
-                                            )}
-                                        </td>
-                                    )
-                                })}
-                            </tr>
-                        )
-                    })}
-                    </tbody>
-                </Table>
+                <TableWrapper table={table} scrolled={scrolled} />
             </ScrollArea>
 
             <Space h="xl"/>
             <Space h="xl"/>
 
-            <Flex
-                mb="20px"
-                mih={50}
-                gap="md"
-                justify="flex-end"
-                align="center"
-                direction="row"
-                wrap="wrap"
-            >
-                <Pagination position="center" page={table.getState().pagination.pageIndex + 1}
-                            onChange={(i) => table.setPageIndex(i - 1)} total={table.getPageCount()}/>
-                {dataQuery.isFetched ?
-                    <Text>{count} Rows | </Text> :
-                    null
-                }
-                <Text>Show</Text>
-                <Select w="80px"
-                        value={table.getState().pagination.pageSize + ''}
-                        onChange={e =>
-                            table.setPageSize(Number(e))
-                        }
-                        data={['10', '20', '50']}/>
-
-            </Flex>
+            <PaginationWrapper table={table} count={count} ready={dataQuery.isFetched} />
         </>
     );
 };

@@ -50,6 +50,11 @@ func connectToPostgres(config PostgresConfig) (*sql.DB, error) {
 		return nil, err
 	}
 
+	err = postgresDb.Ping()
+	if err != nil {
+		return nil, err
+	}
+
 	logger.L().Info("connected to Postgres database")
 
 	return postgresDb, nil
