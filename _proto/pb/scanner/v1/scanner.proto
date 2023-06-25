@@ -5,7 +5,6 @@ package scanner.v1;
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/api/http.proto";
-import "google/protobuf/timestamp.proto";
 
 service ScannerService {
   rpc AddScan (AddScanRequest) returns (AddScanResponse) {
@@ -51,7 +50,7 @@ message GetScansRequest {
 }
 
 message GetScansResponse {
-  ScanReport report = 1;
+  repeated ScanReport reports = 1;
 }
 
 message ScanReport {

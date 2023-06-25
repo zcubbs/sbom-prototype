@@ -3,6 +3,7 @@ package grpc
 import (
 	"context"
 	"fmt"
+	"github.com/google/uuid"
 	"github.com/zcubbs/zlogger/pkg/logger"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -21,17 +22,45 @@ func NewServer(l logger.Logger) *Scanner {
 	return &Scanner{l}
 }
 
-func (s *Scanner) Scan(ctx context.Context, req *pb.ScanRequest) (*pb.ScanResponse, error) {
+func (s *Scanner) AddScan(_ context.Context, req *pb.AddScanRequest) (*pb.AddScanResponse, error) {
 	s.log.Infof("Handle scan request for %s", req.Sbom)
-	return &pb.ScanResponse{ReportId: "1"}, nil
+	return &pb.AddScanResponse{ReportId: "1"}, nil
 }
 
-func (s *Scanner) ScanResults(ctx context.Context, req *pb.ScanResultsRequest) (*pb.ScanResultsResponse, error) {
-	s.log.Infof("Handle scanResults request for %s", req.ReportId)
-	return &pb.ScanResultsResponse{
+func (s *Scanner) GetScan(_ context.Context, req *pb.GetScanRequest) (*pb.GetScanResponse, error) {
+	s.log.Infof("Handle scanResults request for %s", req.Uuid)
+	return &pb.GetScanResponse{
 		Report: &pb.ScanReport{
+			Uuid:            uuid.New().String(),
+			Image:           "test-image",
 			Vulnerabilities: []string{"none"},
 		},
+	}, nil
+}
+
+func (s *Scanner) GetScans(_ context.Context, req *pb.GetScansRequest) (*pb.GetScansResponse, error) {
+	s.log.Infof("Handle GetScans request from start=%s to end=%s", req.Start, req.End)
+	var reports []*pb.ScanReport
+	reports = []*pb.ScanReport{
+		{
+			Uuid:  uuid.New().String(),
+			Image: "image-1",
+			Vulnerabilities: []string{
+				"vul-01",
+				"vul-02",
+			},
+		},
+		{
+			Uuid:  uuid.New().String(),
+			Image: "image-2",
+			Vulnerabilities: []string{
+				"vul-08",
+				"vul-12",
+			},
+		},
+	}
+	return &pb.GetScansResponse{
+		Reports: reports,
 	}, nil
 }
 

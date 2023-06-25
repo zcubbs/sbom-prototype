@@ -48,6 +48,8 @@ func main() {
 
 	sql.MigrateDB(cfg.Database)
 
+	//defer config.ConfigTelemetry(context.Background())()
+
 	if err := run(cfg); err != nil {
 		logger.L().Fatal(err)
 	}

@@ -2,7 +2,6 @@ version: v1
 name: buf.build/sbom-prototype/sbom
 deps:
   - buf.build/googleapis/googleapis
-  - buf.build/google/protobuf
   - buf.build/grpc-ecosystem/grpc-gateway
 breaking:
   use:
