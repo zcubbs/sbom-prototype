@@ -1,10 +1,13 @@
 import React from 'react';
-import {Loader, Text} from "@mantine/core";
+import {Loader, Text, ThemeIcon} from "@mantine/core";
+import {IconClockPause} from "@tabler/icons-react";
 
 const ScanJobStatusCell = (value) => {
     if (value.getValue() === "pending") {
         return (
-            <Loader color="orange" size="sm" variant="dots"/>
+            <ThemeIcon size="lg" color="gray">
+                <IconClockPause size="1.2rem"/>
+            </ThemeIcon>
         );
     }
 

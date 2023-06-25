@@ -8,6 +8,7 @@ import PaginationWrapper from "../../../components/PaginationWrapper.jsx";
 import TableWrapper from "../../../components/TableWrapper.jsx";
 import ScanScoreCell from "./ScanScoreCell.jsx";
 import ScanJobStatusCell from "./ScanJobStatusCell.jsx";
+import ScanJobVulCountCell from "./ScanJobVulCountCell.jsx";
 
 export const JobsTable = () => {
     const [scrolled, setScrolled] = useState(false);
@@ -112,6 +113,7 @@ export const JobsTable = () => {
             header: "Vulnerabilities",
             accessorKey: "vulnerabilityCount",
             id: "vulnerability_count",
+            cell: ScanJobVulCountCell,
             size: 100,
         },
         {
