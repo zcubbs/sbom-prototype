@@ -9,6 +9,7 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.16.0
 	github.com/joho/godotenv v1.5.1
 	github.com/mattes/migrate v3.0.1+incompatible
+	github.com/nats-io/nats.go v1.27.1
 	github.com/rs/cors v1.9.0
 	github.com/spf13/viper v1.16.0
 	github.com/uptrace/uptrace-go v1.16.0
@@ -32,9 +33,13 @@ require (
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/iancoleman/strcase v0.2.0 // indirect
+	github.com/klauspost/compress v1.16.5 // indirect
 	github.com/lib/pq v1.10.2 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
+	github.com/nats-io/nats-server/v2 v2.9.19 // indirect
+	github.com/nats-io/nkeys v0.4.4 // indirect
+	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.8 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/spf13/afero v1.9.5 // indirect
@@ -58,6 +63,7 @@ require (
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
 	go.uber.org/zap v1.24.0 // indirect
+	golang.org/x/crypto v0.9.0 // indirect
 	golang.org/x/mod v0.10.0 // indirect
 	golang.org/x/net v0.10.0 // indirect
 	golang.org/x/sync v0.2.0 // indirect

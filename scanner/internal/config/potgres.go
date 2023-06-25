@@ -7,19 +7,19 @@ import (
 	"github.com/zcubbs/zlogger/pkg/logger"
 )
 
-var Conn *sql.DB
+var DbConn *sql.DB
 
-func GetDbConnection(config DatabaseConfig) (*sql.DB, error) {
+func GetDbConnection(config DatabaseConfig) error {
 	if config.Postgres.Enabled {
 		conn, err := connectToPostgres(config.Postgres)
 		if err != nil {
-			return nil, err
+			return err
 		}
-		Conn = conn
-		return conn, nil
+		DbConn = conn
+		return nil
 	}
 
-	return nil, errors.New("no database profile enabled")
+	return errors.New("no database profile enabled")
 }
 
 func connectToPostgres(config PostgresConfig) (*sql.DB, error) {

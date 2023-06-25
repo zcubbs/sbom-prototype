@@ -16,13 +16,7 @@ import (
 var migrations embed.FS
 
 func MigrateDB(dbCfg config.DatabaseConfig) {
-
-	db, err := config.GetDbConnection(dbCfg)
-
-	if err != nil {
-		logger.L().Fatal("database connection is nil")
-	}
-	driver, err := postgres.WithInstance(db, &postgres.Config{
+	driver, err := postgres.WithInstance(config.DbConn, &postgres.Config{
 		DatabaseName:          dbCfg.Postgres.DbName,
 		SchemaName:            "public",
 		MultiStatementEnabled: true,

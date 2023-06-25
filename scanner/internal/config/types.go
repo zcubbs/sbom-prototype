@@ -8,6 +8,7 @@ type Config struct {
 	Database   DatabaseConfig   `mapstructure:"database" json:"database"`
 	Debug      bool             `mapstructure:"debug" json:"debug"`
 	LoggerType logger.Type      `mapstructure:"logger_type" json:"logger_type"`
+	Nats       NatsConfig       `mapstructure:"nats" json:"nats"`
 }
 
 type HttpServerConfig struct {
@@ -59,4 +60,10 @@ type PostgresConfig struct {
 type Auth0 struct {
 	Domain   string   `mapstructure:"domain" json:"domain"`
 	Audience []string `mapstructure:"audience" json:"audience"`
+}
+
+type NatsConfig struct {
+	Enabled bool   `mapstructure:"enabled" json:"enabled"`
+	Host    string `mapstructure:"host" json:"host"`
+	Port    int    `mapstructure:"port" json:"port"`
 }

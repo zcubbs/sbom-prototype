@@ -26,7 +26,7 @@ func NewServer(l logger.Logger) *Scanner {
 
 func (s *Scanner) AddScanImage(ctx context.Context, req *pb.AddScanImageRequest) (*pb.AddScanImageResponse, error) {
 	s.log.Infof("Handle AddScanImage request for %s", req.Image)
-	h := handler.New(s.log, config.Conn, ctx)
+	h := handler.New(s.log, config.DbConn, ctx)
 	uid, err := h.ScheduleScan(req.Image)
 	if err != nil {
 		return nil, err
@@ -62,7 +62,7 @@ func (s *Scanner) GetScan(_ context.Context, req *pb.GetScanRequest) (*pb.GetSca
 func (s *Scanner) GetScans(ctx context.Context, req *pb.GetScansRequest) (*pb.GetScansResponse, error) {
 	s.log.Infof("Handle GetScans request req=%+v", req)
 
-	h := handler.New(s.log, config.Conn, ctx)
+	h := handler.New(s.log, config.DbConn, ctx)
 
 	response, err := h.GetScans(req.Limit, req.Page)
 	if err != nil {

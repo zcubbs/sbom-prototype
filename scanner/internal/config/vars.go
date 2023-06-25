@@ -39,6 +39,9 @@ var (
 		"database.postgres.database":  "postgres",
 		"database.postgres.ssl_mode":  false,
 		"database.postgres.verbose":   false,
+		"nats.enabled":                false,
+		"nats.host":                   "localhost",
+		"nats.port":                   4222,
 	}
 )
 
@@ -60,6 +63,9 @@ var allowedEnvVarKeys = []string{
 	"database.postgres.database",
 	"database.postgres.ssl_mode",
 	"database.postgres.verbose",
+	"nats.enabled",
+	"nats.host",
+	"nats.port",
 }
 
 func Bootstrap() Config {
