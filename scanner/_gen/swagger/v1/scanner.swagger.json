@@ -16,36 +16,6 @@
     "application/json"
   ],
   "paths": {
-    "/v1/scan": {
-      "get": {
-        "operationId": "ScannerService_GetScan",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1GetScanResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "uuid",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "ScannerService"
-        ]
-      }
-    },
     "/v1/scan/image": {
       "post": {
         "operationId": "ScannerService_AddScanImage",
@@ -103,6 +73,50 @@
             "schema": {
               "$ref": "#/definitions/v1AddScanSbomRequest"
             }
+          }
+        ],
+        "tags": [
+          "ScannerService"
+        ]
+      }
+    },
+    "/v1/scan/{uuid}": {
+      "get": {
+        "operationId": "ScannerService_GetScan",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetScanResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "uuid",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
           }
         ],
         "tags": [
@@ -219,30 +233,52 @@
     "v1GetScanResponse": {
       "type": "object",
       "properties": {
-        "report": {
-          "$ref": "#/definitions/v1ScanReport"
+        "scan": {
+          "$ref": "#/definitions/v1Scan"
         }
       }
     },
     "v1GetScansResponse": {
       "type": "object",
       "properties": {
-        "reports": {
+        "scans": {
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/v1ScanReport"
+            "$ref": "#/definitions/v1Scan"
           }
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1Pagination"
         }
       }
     },
-    "v1ScanReport": {
+    "v1Pagination": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pages": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1Scan": {
       "type": "object",
       "properties": {
         "uuid": {
           "type": "string"
         },
-        "image": {
+        "status": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "updatedAt": {
           "type": "string"
         },
         "vulnerabilities": {
@@ -250,6 +286,16 @@
           "items": {
             "type": "string"
           }
+        },
+        "vulnerabilityCount": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "image": {
+          "type": "string"
+        },
+        "sbom": {
+          "type": "string"
         }
       }
     }

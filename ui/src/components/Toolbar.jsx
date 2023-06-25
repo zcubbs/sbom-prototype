@@ -8,7 +8,7 @@ import {
     SegmentedControl, Text,
     useMantineColorScheme
 } from '@mantine/core';
-import {IconBolt, IconMoon, IconMoonStars, IconSun} from '@tabler/icons-react';
+import {IconBolt, IconBrandGithubFilled, IconMoon, IconMoonStars, IconSun} from '@tabler/icons-react';
 import * as React from "react";
 
 export function Toolbar() {
@@ -26,17 +26,13 @@ export function Toolbar() {
             <Group position="apart">
                 {theme.colorScheme === 'dark' ?
                     <Text style={{color: '#fff' }}>
-                        <IconBolt size={15} style={{marginRight: '5px'}}/>
-                        Find more on
+                        <IconBrandGithubFilled size={15} style={{marginRight: '5px'}}/>
                         <a style={{color: '#fff', marginLeft: '5px'}} href="https://github.com/zcubbs">github/zcubbs</a>
-                        - MIT {new Date().getFullYear()}
                     </Text>
                     :
                     <Text>
-                        <IconBolt size={15} style={{marginRight: '5px'}}/>
-                        Find more on Github
+                        <IconBrandGithubFilled size={15} style={{marginRight: '5px'}}/>
                         <a style={{marginLeft: '5px'}}  href="https://github.com/zcubbs">github/zcubbs</a>
-                        - MIT {new Date().getFullYear()}
                     </Text>
                 }
 

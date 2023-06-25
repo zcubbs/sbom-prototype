@@ -3,7 +3,7 @@
 //   sqlc v1.18.0
 // source: scan.sql
 
-package repository
+package store
 
 import (
 	"context"
@@ -15,7 +15,7 @@ import (
 const createScan = `-- name: CreateScan :one
 INSERT INTO scan (id, uuid)
 values ($1, $2)
-RETURNING id, uuid, created_at
+RETURNING id, uuid, created_at, updated_at, image, status, sbom, report
 `
 
 type CreateScanParams struct {
@@ -26,7 +26,16 @@ type CreateScanParams struct {
 func (q *Queries) CreateScan(ctx context.Context, arg CreateScanParams) (Scan, error) {
 	row := q.queryRow(ctx, q.createScanStmt, createScan, arg.ID, arg.Uuid)
 	var i Scan
-	err := row.Scan(&i.ID, &i.Uuid, &i.CreatedAt)
+	err := row.Scan(
+		&i.ID,
+		&i.Uuid,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.Image,
+		&i.Status,
+		&i.Sbom,
+		&i.Report,
+	)
 	return i, err
 }
 
@@ -53,7 +62,7 @@ func (q *Queries) DeleteScanByUUID(ctx context.Context, argUuid uuid.UUID) error
 }
 
 const getScanById = `-- name: GetScanById :one
-SELECT id, uuid, created_at
+SELECT id, uuid, created_at, updated_at, image, status, sbom, report
 FROM scan
 WHERE id = $1
 `
@@ -61,12 +70,21 @@ WHERE id = $1
 func (q *Queries) GetScanById(ctx context.Context, id sql.NullInt32) (Scan, error) {
 	row := q.queryRow(ctx, q.getScanByIdStmt, getScanById, id)
 	var i Scan
-	err := row.Scan(&i.ID, &i.Uuid, &i.CreatedAt)
+	err := row.Scan(
+		&i.ID,
+		&i.Uuid,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.Image,
+		&i.Status,
+		&i.Sbom,
+		&i.Report,
+	)
 	return i, err
 }
 
 const getScanByUUID = `-- name: GetScanByUUID :one
-SELECT id, uuid, created_at
+SELECT id, uuid, created_at, updated_at, image, status, sbom, report
 FROM scan
 WHERE uuid = $1
 `
@@ -74,18 +92,33 @@ WHERE uuid = $1
 func (q *Queries) GetScanByUUID(ctx context.Context, argUuid uuid.UUID) (Scan, error) {
 	row := q.queryRow(ctx, q.getScanByUUIDStmt, getScanByUUID, argUuid)
 	var i Scan
-	err := row.Scan(&i.ID, &i.Uuid, &i.CreatedAt)
+	err := row.Scan(
+		&i.ID,
+		&i.Uuid,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.Image,
+		&i.Status,
+		&i.Sbom,
+		&i.Report,
+	)
 	return i, err
 }
 
 const getScans = `-- name: GetScans :many
-SELECT id, uuid, created_at
+SELECT id, uuid, created_at, updated_at, image, status, sbom, report
 FROM scan
-ORDER BY created_at DESC
+ORDER BY created_at desc
+LIMIT $1 OFFSET $2
 `
 
-func (q *Queries) GetScans(ctx context.Context) ([]Scan, error) {
-	rows, err := q.query(ctx, q.getScansStmt, getScans)
+type GetScansParams struct {
+	Limit  int32 `json:"limit"`
+	Offset int32 `json:"offset"`
+}
+
+func (q *Queries) GetScans(ctx context.Context, arg GetScansParams) ([]Scan, error) {
+	rows, err := q.query(ctx, q.getScansStmt, getScans, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -93,7 +126,16 @@ func (q *Queries) GetScans(ctx context.Context) ([]Scan, error) {
 	var items []Scan
 	for rows.Next() {
 		var i Scan
-		if err := rows.Scan(&i.ID, &i.Uuid, &i.CreatedAt); err != nil {
+		if err := rows.Scan(
+			&i.ID,
+			&i.Uuid,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.Image,
+			&i.Status,
+			&i.Sbom,
+			&i.Report,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

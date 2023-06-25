@@ -2,7 +2,12 @@ create table if not exists scan
 (
     id         serial,
     uuid       uuid      default gen_random_uuid() not null,
-    created_at timestamp default now()             not null
+    created_at timestamp default now()             not null,
+    updated_at timestamp default now()             not null,
+    image     text     not null,
+    status    text    not null default 'pending',
+    sbom      text,
+    report    text
 );
 
 alter table scan

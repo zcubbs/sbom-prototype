@@ -23,7 +23,7 @@ service ScannerService {
 
   rpc GetScan (GetScanRequest) returns (GetScanResponse) {
     option (google.api.http) = {
-      get: "/v1/scan"
+      get: "/v1/scan/{uuid}"
     };
   }
 
@@ -32,6 +32,22 @@ service ScannerService {
       get: "/v1/scans"
     };
   }
+}
+
+message Scan {
+  string uuid = 1;
+  string status = 2;
+  string created_at = 3;
+  string updated_at = 4;
+  repeated string vulnerabilities = 5;
+  int32 vulnerability_count = 6;
+  string image = 7;
+  string sbom = 8;
+}
+
+message Pagination {
+  int32 count = 1;
+  int32 pages = 2;
 }
 
 message AddScanImageRequest {
@@ -52,10 +68,12 @@ message AddScanSbomResponse {
 
 message GetScanRequest {
   string uuid = 1;
+  int64 limit = 2;
+  int64 offset = 3;
 }
 
 message GetScanResponse {
-  ScanReport report = 1;
+  Scan scan = 1;
 }
 
 message GetScansRequest {
@@ -65,7 +83,8 @@ message GetScansRequest {
 }
 
 message GetScansResponse {
-  repeated ScanReport reports = 1;
+  repeated Scan scans = 1;
+  Pagination pagination = 2;
 }
 
 message ScanReport {

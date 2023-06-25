@@ -26,6 +26,7 @@ WHERE uuid = $1;
 -- name: GetScans :many
 SELECT *
 FROM scan
-ORDER BY created_at DESC;
+ORDER BY created_at desc
+LIMIT $1 OFFSET $2;
 
 

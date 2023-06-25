@@ -1,16 +1,11 @@
 import React, {Fragment} from 'react';
-import {Box, Button} from "@mantine/core";
-import {useQuery} from "@tanstack/react-query";
-import {fetchScans, sendScanImage} from "./api.js";
+import {Box, Button, Paper, Space, Text, Title} from "@mantine/core";
+import {sendScanImage} from "./api.js";
+import {ScanJobsTable} from "../../../components/ScanJobsTable.jsx";
+import {Link} from "react-router-dom";
+import Filters from "../../../components/Filters.jsx";
 
 const ScannerScanImageView = () => {
-    const {isLoading, error, data} = useQuery({
-        queryKey: ['repoData'],
-        queryFn: () => fetchScans(),
-    })
-
-    if (isLoading) return 'Loading...'
-    if (error) return 'An error has occurred: ' + error.message
 
     const runScan = () => {
         sendScanImage("test")
@@ -18,16 +13,32 @@ const ScannerScanImageView = () => {
             .catch(e => console.log(e));
     }
 
+    const breadcrumbs = [
+        {title: 'Scans', href: '/scans'},
+        {title: 'Jobs', href: '/scans'},
+    ].map((item, index) => (
+        <Text component={Link} variant="link" to={item.href} key={index}>
+            {item.title}
+        </Text>
+    ));
+
     return (
         <Fragment>
             <Box p="lg">
-                <div className="App">
-                    <p>{data.uuid}</p>
-                    <p>{data.image}</p>
-                </div>
-                <Button onClick={runScan}>
-                    Run Scan
-                </Button>
+                <Paper bg="none">
+                    <Title fw="lighter" size="xx-large" mb="xl">Scans</Title>
+                </Paper>
+
+                <Paper padding="md" radius={0} style={{padding: "30px"}}>
+                    <Button onClick={runScan}>
+                        Run Scan
+                    </Button>
+                    {/*<Filters onChange={onFilterChange}/>*/}
+                </Paper>
+
+                <Space h="xl"/>
+
+                <ScanJobsTable />
             </Box>
         </Fragment>
     );

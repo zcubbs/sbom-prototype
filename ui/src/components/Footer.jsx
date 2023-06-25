@@ -43,14 +43,12 @@ export default function Footer() {
                 {theme.colorScheme === 'dark' ?
                     <Text style={{color: '#fff' }}>
                         <IconBolt size={15} style={{marginRight: '5px'}}/>
-                        Find more on
                         <a style={{color: '#fff', marginLeft: '5px'}} href="https://github.com/zcubbs">github/zcubbs</a>
                         - MIT {new Date().getFullYear()}
                     </Text>
                     :
                     <Text>
                         <IconBolt size={15} style={{marginRight: '5px'}}/>
-                        Find more on Github
                         <a style={{marginLeft: '5px'}}  href="https://github.com/zcubbs">github/zcubbs</a>
                         - MIT {new Date().getFullYear()}
                     </Text>

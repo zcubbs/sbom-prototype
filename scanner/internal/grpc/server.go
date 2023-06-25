@@ -10,6 +10,7 @@ import (
 	"google.golang.org/grpc/reflection"
 	"log"
 	"net"
+	"time"
 	pb "zel/sbom-prototype/scanner/_gen/go/v1"
 	"zel/sbom-prototype/scanner/internal/config"
 )
@@ -35,37 +36,54 @@ func (s *Scanner) AddScanSbom(_ context.Context, req *pb.AddScanSbomRequest) (*p
 func (s *Scanner) GetScan(_ context.Context, req *pb.GetScanRequest) (*pb.GetScanResponse, error) {
 	s.log.Infof("Handle scanResults request for %s", req.Uuid)
 	return &pb.GetScanResponse{
-		Report: &pb.ScanReport{
+		Scan: &pb.Scan{
 			Uuid:            uuid.New().String(),
 			Image:           "test-image",
-			Vulnerabilities: []string{"none"},
+			Sbom:            "",
+			Vulnerabilities: nil,
+			Status:          "pending",
+			CreatedAt:       time.Now().Format(time.ANSIC),
+			UpdatedAt:       time.Now().Format(time.ANSIC),
 		},
 	}, nil
 }
 
 func (s *Scanner) GetScans(_ context.Context, req *pb.GetScansRequest) (*pb.GetScansResponse, error) {
 	s.log.Infof("Handle GetScans request from start=%s to end=%s", req.Start, req.End)
-	var reports []*pb.ScanReport
-	reports = []*pb.ScanReport{
-		{
-			Uuid:  uuid.New().String(),
-			Image: "image-1",
-			Vulnerabilities: []string{
-				"vul-01",
-				"vul-02",
-			},
-		},
-		{
-			Uuid:  uuid.New().String(),
-			Image: "image-2",
-			Vulnerabilities: []string{
-				"vul-08",
-				"vul-12",
-			},
-		},
-	}
+
 	return &pb.GetScansResponse{
-		Reports: reports,
+		Scans: []*pb.Scan{
+			{
+				Uuid:  uuid.New().String(),
+				Image: "test-image",
+				Sbom:  "",
+				Vulnerabilities: []string{
+					"vul-01",
+					"vul-02",
+				},
+				VulnerabilityCount: 5,
+				Status:             "pending",
+				CreatedAt:          time.Now().Format(time.ANSIC),
+				UpdatedAt:          time.Now().Format(time.ANSIC),
+			},
+			{
+				Uuid:  uuid.New().String(),
+				Image: "test-image2",
+				Sbom:  "",
+				Vulnerabilities: []string{
+					"vul-01",
+					"vul-25",
+				},
+				VulnerabilityCount: 12,
+				Status:             "pending",
+				CreatedAt:          time.Now().Format(time.ANSIC),
+				UpdatedAt:          time.Now().Format(time.ANSIC),
+			},
+		},
+		Pagination: &pb.Pagination{
+			Count: 1,
+			Pages: 1,
+		},
 	}, nil
 }
 
