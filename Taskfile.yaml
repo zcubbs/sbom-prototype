@@ -90,30 +90,69 @@ tasks:
       - cmd: buf lint
 
   tls:
-    env:
-      SCANNER_DIR: './scanner'
-      REGISTRY_DIR: './registry'
-      CLI_DIR: './cli'
-      SCRIPTS_DIR: '_scripts'
-      TLS_DIR: 'tls'
-      TLS_GENERATED_DIR: 'tls/generated'
-      GENERATED_DIR: '_gen'
     cmds:
-      - task: tls-scanner-{{OS}}
+      - task: tls-generate
+      - task: tls-copy-scanner-{{OS}}
+      - task: tls-copy-registry-{{OS}}
+      - task: tls-copy-cli-{{OS}}
 
-  tls-scanner-windows:
+  tls-generate:
+    dir: "_scripts/tls"
     cmds:
-      - echo "Generating SSL certificate..." $SCRIPTS_DIR
-      - cmd: Powershell.exe New-Item -Path $SCRIPTS_DIR/$TLS_GENERATED_DIR -ItemType Directory -ErrorAction SilentlyContinue
+      - echo "Generating SSL certificates..."
+      - cmd: Powershell.exe New-Item -Path ./generated -ItemType Directory -ErrorAction SilentlyContinue
         ignore_error: true
-      - openssl genrsa -out $SCRIPTS_DIR/$TLS_GENERATED_DIR/ca.key 4096
-      - openssl req -new -x509 -key $SCRIPTS_DIR/$TLS_GENERATED_DIR/ca.key -sha256 -subj "/C=SE/ST=HL/O=Example, INC." -days 365 -out $SCRIPTS_DIR/$TLS_GENERATED_DIR/ca.cert
-      - openssl genrsa -out $SCRIPTS_DIR/$TLS_GENERATED_DIR/server.key 4096
-      - openssl req -new -key $SCRIPTS_DIR/$TLS_GENERATED_DIR/server.key -out $SCRIPTS_DIR/$TLS_GENERATED_DIR/server.csr -config $SCRIPTS_DIR/$TLS_DIR/certificate.conf
-      - openssl x509 -req -in $SCRIPTS_DIR/$TLS_GENERATED_DIR/server.csr -CA $SCRIPTS_DIR/$TLS_GENERATED_DIR/ca.cert -CAkey $SCRIPTS_DIR/$TLS_GENERATED_DIR/ca.key -CAcreateserial -out $SCRIPTS_DIR/$TLS_GENERATED_DIR/server.crt -days 365 -sha256 -extfile $SCRIPTS_DIR/$TLS_DIR/certificate.conf -extensions req_ext
+      - openssl genrsa -out ./generated/ca.key 4096
+      - openssl req -new -x509 -key ./generated/ca.key -sha256 -subj "/C=SE/ST=HL/O=Example, INC." -days 365 -out ./generated/ca.cert
+      - openssl genrsa -out ./generated/server.key 4096
+      - openssl req -new -key ./generated/server.key -out ./generated/server.csr -config ./certificate.conf
+      - openssl x509 -req -in ./generated/server.csr -CA ./generated/ca.cert -CAkey ./generated/ca.key -CAcreateserial -out ./generated/server.crt -days 365 -sha256 -extfile ./certificate.conf -extensions req_ext
       - echo "SSL certificate generated."
-      - echo "Copying SSL certificate to tls directory..."
-      - cmd: Powershell.exe New-Item -Path $API_DIR/_generated/tls -ItemType Directory -ErrorAction SilentlyContinue
+
+  tls-copy-cert-windows:
+    cmds:
+      - Powershell.exe Copy-Item {{ .SOURCE_PATH }}/server.crt -Destination {{ .COPY_PATH }}/server.crt
+
+
+  tls-copy-key-windows:
+    cmds:
+      - Powershell.exe Copy-Item {{ .SOURCE_PATH }}/server.key -Destination {{ .COPY_PATH }}/server.key
+
+  tls-copy-scanner-windows:
+    vars:
+      SOURCE_PATH: '_scripts/tls/generated'
+      COPY_PATH: 'scanner/_gen/tls'
+    cmds:
+      - task: mkdir-windows
+        vars: { DIR_PATH: '{{ .COPY_PATH }}' }
+      - task: tls-copy-cert-windows
+        vars: { SOURCE_PATH: '{{ .SOURCE_PATH }}', COPY_PATH: '{{ .COPY_PATH }}' }
+      - task: tls-copy-key-windows
+        vars: { SOURCE_PATH: '{{ .SOURCE_PATH }}', COPY_PATH: '{{ .COPY_PATH }}' }
+
+  tls-copy-registry-windows:
+    vars:
+      SOURCE_PATH: '_scripts/tls/generated'
+      COPY_PATH: 'registry/_gen/tls'
+    cmds:
+      - task: mkdir-windows
+        vars: { DIR_PATH: '{{ .COPY_PATH }}' }
+      - task: tls-copy-cert-windows
+        vars: { SOURCE_PATH: '{{ .SOURCE_PATH }}', COPY_PATH: '{{ .COPY_PATH }}' }
+      - task: tls-copy-key-windows
+        vars: { SOURCE_PATH: '{{ .SOURCE_PATH }}', COPY_PATH: '{{ .COPY_PATH }}' }
+
+  tls-copy-cli-windows:
+    vars:
+      SOURCE_PATH: '_scripts/tls/generated'
+      COPY_PATH: 'cli/_gen/tls'
+    cmds:
+      - task: mkdir-windows
+        vars: { DIR_PATH: '{{ .COPY_PATH }}' }
+      - task: tls-copy-cert-windows
+        vars: { SOURCE_PATH: '{{ .SOURCE_PATH }}', COPY_PATH: '{{ .COPY_PATH }}' }
+
+  mkdir-windows:
+    cmds:
+      - cmd: Powershell.exe New-Item -Path {{ .DIR_PATH }} -ItemType Directory -ErrorAction SilentlyContinue
         ignore_error: true
-      - Powershell.exe Copy-Item $SCRIPTS_DIR/$TLS_DIR/$GENERATED_DIR/server.crt -Destination $API_DIR/_generated/tls/server.crt
-      - Powershell.exe Copy-Item $SCRIPTS_DIR/$TLS_DIR/$GENERATED_DIR/server.key -Destination $API_DIR/_generated/tls/server.key
