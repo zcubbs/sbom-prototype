@@ -22,7 +22,8 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ScannerServiceClient interface {
-	AddScan(ctx context.Context, in *AddScanRequest, opts ...grpc.CallOption) (*AddScanResponse, error)
+	AddScanImage(ctx context.Context, in *AddScanImageRequest, opts ...grpc.CallOption) (*AddScanImageResponse, error)
+	AddScanSbom(ctx context.Context, in *AddScanSbomRequest, opts ...grpc.CallOption) (*AddScanSbomResponse, error)
 	GetScan(ctx context.Context, in *GetScanRequest, opts ...grpc.CallOption) (*GetScanResponse, error)
 	GetScans(ctx context.Context, in *GetScansRequest, opts ...grpc.CallOption) (*GetScansResponse, error)
 }
@@ -35,9 +36,18 @@ func NewScannerServiceClient(cc grpc.ClientConnInterface) ScannerServiceClient {
 	return &scannerServiceClient{cc}
 }
 
-func (c *scannerServiceClient) AddScan(ctx context.Context, in *AddScanRequest, opts ...grpc.CallOption) (*AddScanResponse, error) {
-	out := new(AddScanResponse)
-	err := c.cc.Invoke(ctx, "/scanner.v1.ScannerService/AddScan", in, out, opts...)
+func (c *scannerServiceClient) AddScanImage(ctx context.Context, in *AddScanImageRequest, opts ...grpc.CallOption) (*AddScanImageResponse, error) {
+	out := new(AddScanImageResponse)
+	err := c.cc.Invoke(ctx, "/scanner.v1.ScannerService/AddScanImage", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *scannerServiceClient) AddScanSbom(ctx context.Context, in *AddScanSbomRequest, opts ...grpc.CallOption) (*AddScanSbomResponse, error) {
+	out := new(AddScanSbomResponse)
+	err := c.cc.Invoke(ctx, "/scanner.v1.ScannerService/AddScanSbom", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +76,8 @@ func (c *scannerServiceClient) GetScans(ctx context.Context, in *GetScansRequest
 // All implementations should embed UnimplementedScannerServiceServer
 // for forward compatibility
 type ScannerServiceServer interface {
-	AddScan(context.Context, *AddScanRequest) (*AddScanResponse, error)
+	AddScanImage(context.Context, *AddScanImageRequest) (*AddScanImageResponse, error)
+	AddScanSbom(context.Context, *AddScanSbomRequest) (*AddScanSbomResponse, error)
 	GetScan(context.Context, *GetScanRequest) (*GetScanResponse, error)
 	GetScans(context.Context, *GetScansRequest) (*GetScansResponse, error)
 }
@@ -75,8 +86,11 @@ type ScannerServiceServer interface {
 type UnimplementedScannerServiceServer struct {
 }
 
-func (UnimplementedScannerServiceServer) AddScan(context.Context, *AddScanRequest) (*AddScanResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AddScan not implemented")
+func (UnimplementedScannerServiceServer) AddScanImage(context.Context, *AddScanImageRequest) (*AddScanImageResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddScanImage not implemented")
+}
+func (UnimplementedScannerServiceServer) AddScanSbom(context.Context, *AddScanSbomRequest) (*AddScanSbomResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddScanSbom not implemented")
 }
 func (UnimplementedScannerServiceServer) GetScan(context.Context, *GetScanRequest) (*GetScanResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetScan not implemented")
@@ -96,20 +110,38 @@ func RegisterScannerServiceServer(s grpc.ServiceRegistrar, srv ScannerServiceSer
 	s.RegisterService(&ScannerService_ServiceDesc, srv)
 }
 
-func _ScannerService_AddScan_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(AddScanRequest)
+func _ScannerService_AddScanImage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddScanImageRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ScannerServiceServer).AddScan(ctx, in)
+		return srv.(ScannerServiceServer).AddScanImage(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/scanner.v1.ScannerService/AddScan",
+		FullMethod: "/scanner.v1.ScannerService/AddScanImage",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ScannerServiceServer).AddScan(ctx, req.(*AddScanRequest))
+		return srv.(ScannerServiceServer).AddScanImage(ctx, req.(*AddScanImageRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ScannerService_AddScanSbom_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddScanSbomRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ScannerServiceServer).AddScanSbom(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/scanner.v1.ScannerService/AddScanSbom",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ScannerServiceServer).AddScanSbom(ctx, req.(*AddScanSbomRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -158,8 +190,12 @@ var ScannerService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*ScannerServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "AddScan",
-			Handler:    _ScannerService_AddScan_Handler,
+			MethodName: "AddScanImage",
+			Handler:    _ScannerService_AddScanImage_Handler,
+		},
+		{
+			MethodName: "AddScanSbom",
+			Handler:    _ScannerService_AddScanSbom_Handler,
 		},
 		{
 			MethodName: "GetScan",

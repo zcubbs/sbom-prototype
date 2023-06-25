@@ -9,9 +9,11 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.16.0
 	github.com/joho/godotenv v1.5.1
 	github.com/mattes/migrate v3.0.1+incompatible
+	github.com/rs/cors v1.9.0
 	github.com/spf13/viper v1.16.0
 	github.com/uptrace/uptrace-go v1.16.0
 	github.com/zcubbs/zlogger v1.1.0
+	go.opentelemetry.io/otel v1.16.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20230530153820-e85fd2cbaebc
 	google.golang.org/grpc v1.55.0
 	google.golang.org/protobuf v1.30.0
@@ -42,7 +44,6 @@ require (
 	github.com/subosito/gotenv v1.4.2 // indirect
 	github.com/vektah/gqlparser/v2 v2.5.1 // indirect
 	go.opentelemetry.io/contrib/instrumentation/runtime v0.42.0 // indirect
-	go.opentelemetry.io/otel v1.16.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/internal/retry v1.16.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlpmetric v0.39.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc v0.39.0 // indirect

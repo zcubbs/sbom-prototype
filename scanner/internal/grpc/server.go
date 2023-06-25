@@ -22,9 +22,14 @@ func NewServer(l logger.Logger) *Scanner {
 	return &Scanner{l}
 }
 
-func (s *Scanner) AddScan(_ context.Context, req *pb.AddScanRequest) (*pb.AddScanResponse, error) {
-	s.log.Infof("Handle scan request for %s", req.Sbom)
-	return &pb.AddScanResponse{ReportId: "1"}, nil
+func (s *Scanner) AddScanImage(_ context.Context, req *pb.AddScanImageRequest) (*pb.AddScanImageResponse, error) {
+	s.log.Infof("Handle AddScanImage request for %s", req.Image)
+	return &pb.AddScanImageResponse{ReportId: "1"}, nil
+}
+
+func (s *Scanner) AddScanSbom(_ context.Context, req *pb.AddScanSbomRequest) (*pb.AddScanSbomResponse, error) {
+	s.log.Infof("Handle AddScanSbom request for %s", req.Sbom)
+	return &pb.AddScanSbomResponse{ReportId: "1"}, nil
 }
 
 func (s *Scanner) GetScan(_ context.Context, req *pb.GetScanRequest) (*pb.GetScanResponse, error) {

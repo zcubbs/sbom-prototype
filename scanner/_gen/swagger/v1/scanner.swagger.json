@@ -44,14 +44,16 @@
         "tags": [
           "ScannerService"
         ]
-      },
+      }
+    },
+    "/v1/scan/image": {
       "post": {
-        "operationId": "ScannerService_AddScan",
+        "operationId": "ScannerService_AddScanImage",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1AddScanResponse"
+              "$ref": "#/definitions/v1AddScanImageResponse"
             }
           },
           "default": {
@@ -63,11 +65,43 @@
         },
         "parameters": [
           {
-            "name": "sbom",
+            "name": "body",
             "in": "body",
             "required": true,
             "schema": {
-              "type": "string"
+              "$ref": "#/definitions/v1AddScanImageRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ScannerService"
+        ]
+      }
+    },
+    "/v1/scan/sbom": {
+      "post": {
+        "operationId": "ScannerService_AddScanSbom",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1AddScanSbomResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1AddScanSbomRequest"
             }
           }
         ],
@@ -150,7 +184,31 @@
         }
       }
     },
-    "v1AddScanResponse": {
+    "v1AddScanImageRequest": {
+      "type": "object",
+      "properties": {
+        "image": {
+          "type": "string"
+        }
+      }
+    },
+    "v1AddScanImageResponse": {
+      "type": "object",
+      "properties": {
+        "reportId": {
+          "type": "string"
+        }
+      }
+    },
+    "v1AddScanSbomRequest": {
+      "type": "object",
+      "properties": {
+        "sbom": {
+          "type": "string"
+        }
+      }
+    },
+    "v1AddScanSbomResponse": {
       "type": "object",
       "properties": {
         "reportId": {

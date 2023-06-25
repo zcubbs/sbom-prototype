@@ -13,6 +13,7 @@ import (
 	"zel/sbom-prototype/scanner/internal/config"
 	scannerGrpc "zel/sbom-prototype/scanner/internal/grpc"
 	//pb "zel/sbom-prototype/scanner/proto/sbom/v1"
+	"github.com/rs/cors"
 	"zel/sbom-prototype/scanner/sql"
 )
 
@@ -34,9 +35,19 @@ func run(cfg config.Config) error {
 		return err
 	}
 
+	// cors
+	withCors := cors.New(cors.Options{
+		AllowOriginFunc:  func(origin string) bool { return true },
+		AllowedMethods:   []string{"GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"ACCEPT", "Authorization", "Content-Type", "X-CSRF-Token"},
+		ExposedHeaders:   []string{"Link"},
+		AllowCredentials: true,
+		MaxAge:           300,
+	}).Handler(mux)
+
 	// Start HTTP server (and proxy calls to gRPC server endpoint)
 	logger.L().Infof("Starting server on port %d", cfg.HttpServer.Port)
-	return http.ListenAndServe(fmt.Sprintf(":%d", cfg.HttpServer.Port), mux)
+	return http.ListenAndServe(fmt.Sprintf(":%d", cfg.HttpServer.Port), withCors)
 }
 
 func main() {

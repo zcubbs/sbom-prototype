@@ -7,10 +7,17 @@ import "google/api/annotations.proto";
 //import "google/api/http.proto";
 
 service ScannerService {
-  rpc AddScan (AddScanRequest) returns (AddScanResponse) {
+  rpc AddScanImage (AddScanImageRequest) returns (AddScanImageResponse) {
     option (google.api.http) = {
-      post: "/v1/scan"
-      body: "sbom"
+      post: "/v1/scan/image"
+      body: "*"
+    };
+  }
+
+  rpc AddScanSbom (AddScanSbomRequest) returns (AddScanSbomResponse) {
+    option (google.api.http) = {
+      post: "/v1/scan/sbom"
+      body: "*"
     };
   }
 
@@ -27,11 +34,19 @@ service ScannerService {
   }
 }
 
-message AddScanRequest {
+message AddScanImageRequest {
+  string image = 2;
+}
+
+message AddScanImageResponse {
+  string report_id = 1;
+}
+
+message AddScanSbomRequest {
   string sbom = 1;
 }
 
-message AddScanResponse {
+message AddScanSbomResponse {
   string report_id = 1;
 }
 
