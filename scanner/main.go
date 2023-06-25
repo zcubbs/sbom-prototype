@@ -3,46 +3,52 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/zcubbs/zlogger/pkg/logger"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"net/http"
-	pb "zel/sbom-prototype/scanner/proto/sbom/v1"
+	pb "zel/sbom-prototype/scanner/_gen/go/v1"
+	"zel/sbom-prototype/scanner/internal/config"
+	scannerGrpc "zel/sbom-prototype/scanner/internal/grpc"
+	//pb "zel/sbom-prototype/scanner/proto/sbom/v1"
+	"zel/sbom-prototype/scanner/sql"
 )
 
-var (
-	// command-line options:
-	// gRPC server endpoint
-	grpcServerEndpoint = flag.String("grpc-server-endpoint", "localhost:9000", "gRPC server endpoint")
-)
-
-func run() error {
+func run(cfg config.Config) error {
 	ctx := context.Background()
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	// Register gRPC server endpoint
-	// Note: Make sure the gRPC server is running properly and accessible
+	// Start gRPC server
+	logger.L().Infof("Starting gRPC server on port %s", cfg.Grpc.Server.Port)
+	go scannerGrpc.StartGrpcServer(cfg.Grpc.Server)
+
+	// Register gRPC server Gateway endpoint
+	grpcServPort := fmt.Sprintf(":%d", cfg.Grpc.Server.Port)
 	mux := runtime.NewServeMux()
 	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
-	err := pb.RegisterScannerServiceHandlerFromEndpoint(ctx, mux, *grpcServerEndpoint, opts)
+	err := pb.RegisterScannerServiceHandlerFromEndpoint(ctx, mux, grpcServPort, opts)
 	if err != nil {
 		return err
 	}
 
-	logger.L().Infof("Starting HTTP server on port 8001")
-
 	// Start HTTP server (and proxy calls to gRPC server endpoint)
-	return http.ListenAndServe(":8001", mux)
+	logger.L().Infof("Starting server on port %d", cfg.HttpServer.Port)
+	return http.ListenAndServe(fmt.Sprintf(":%d", cfg.HttpServer.Port), mux)
 }
 
 func main() {
 	flag.Parse()
 
-	logger.SetupLogger(logger.ZapLogger)
+	cfg := config.Bootstrap()
 
-	if err := run(); err != nil {
+	logger.SetupLogger(cfg.LoggerType)
+
+	sql.MigrateDB(cfg.Database)
+
+	if err := run(cfg); err != nil {
 		logger.L().Fatal(err)
 	}
 }

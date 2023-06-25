@@ -1,26 +1,72 @@
 version: "3"
 includes: {}
 tasks:
+  bootstrap:
+    dir: "."
+    cmds:
+      - cmd: go install github.com/securego/gosec/v2/cmd/gosec@latest
+      - cmd: go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+      - cmd: go install github.com/spf13/cobra-cli@latest
+      - cmd: go install github.com/kyleconroy/sqlc/cmd/sqlc@latest
+
+  sqlc:
+    cmds:
+      - task: sqlc-scanner-{{OS}}
+
+  sqlc-scanner-windows:
+    dir: "scanner"
+    cmds:
+      - cmd: docker run --rm -v "${PWD}:/src" -w /src kjconroy/sqlc generate
+
+  sqlc-scanner-darwin:
+    dir: "scanner"
+    cmds:
+      - cmd: sqlc generate
+
   pb:
     dir: "."
     cmds:
-      - task: pb-clean
-      - task: pb-update
-      - cmd: buf generate
+      - task: pb-clean-{{OS}}
+      - task: pb-update-scanner
+      - task: pb-update-registry
+      - task: pb-gen-scanner
+      - task: pb-gen-registry
 
-  pb-clean:
+  pb-clean-windows:
     cmds:
-      - cmd: Powershell.exe Remove-Item '.\api\proto' -Recurse -Force -ErrorAction SilentlyContinue
+      - cmd: Powershell.exe Remove-Item '.\cli\_gen' -Recurse -Force -ErrorAction SilentlyContinue
         ignore_error: true
-      - cmd: Powershell.exe Remove-Item '.\api\openapi' -Recurse -Force -ErrorAction SilentlyContinue
+      - cmd: Powershell.exe Remove-Item '.\registry\_gen' -Recurse -Force -ErrorAction SilentlyContinue
         ignore_error: true
-      - cmd: Powershell.exe Remove-Item '.\registry\proto' -Recurse -Force -ErrorAction SilentlyContinue
-        ignore_error: true
-      - cmd: Powershell.exe Remove-Item '.\scanner\proto' -Recurse -Force -ErrorAction SilentlyContinue
+      - cmd: Powershell.exe Remove-Item '.\scanner\_gen' -Recurse -Force -ErrorAction SilentlyContinue
         ignore_error: true
 
-  pb-update:
-    dir: './proto'
+  pb-clean-darwin:
+    cmds:
+      - cmd: rm -rf ./cli/_gen
+        ignore_error: true
+      - cmd: rm -rf ./registry/_gen
+        ignore_error: true
+      - cmd: rm -rf ./scanner/_gen
+        ignore_error: true
+
+  pb-update-scanner:
+    dir: "_proto/pb/scanner"
     cmds:
       - cmd: buf mod update
+
+  pb-update-registry:
+    dir: "_proto/pb/registry"
+    cmds:
+      - cmd: buf mod update
+
+  pb-gen-scanner:
+    dir: "_proto/pb/scanner"
+    cmds:
+      - cmd: buf generate
+
+  pb-gen-registry:
+    dir: "_proto/pb/registry"
+    cmds:
+      - cmd: buf generate
 

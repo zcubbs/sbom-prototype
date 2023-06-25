@@ -1,0 +1,20 @@
+version: v1
+name: buf.build/sbom-prototype/sbom
+deps:
+  - buf.build/googleapis/googleapis
+  - buf.build/google/protobuf
+  - buf.build/grpc-ecosystem/grpc-gateway
+breaking:
+  use:
+    - FILE
+lint:
+#  ignore:
+#    - third_party/google/api/annotations.proto
+#    - third_party/google/api/http.proto
+#    - third_party/google/api/field_behavior.proto
+  use:
+    - DEFAULT
+  rpc_allow_google_protobuf_empty_responses: true
+#build:
+#  excludes:
+#    - third_party

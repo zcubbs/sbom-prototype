@@ -1,6 +1,0 @@
-version: v1
-directories:
-  - _third_party_proto
-  - scanner
-#  - registry
-  - cli

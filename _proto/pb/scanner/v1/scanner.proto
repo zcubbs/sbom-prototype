@@ -1,0 +1,61 @@
+syntax = "proto3";
+
+package scanner.v1;
+
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/api/http.proto";
+import "google/protobuf/timestamp.proto";
+
+service ScannerService {
+  rpc AddScan (AddScanRequest) returns (AddScanResponse) {
+    option (google.api.http) = {
+      post: "/v1/scan"
+      body: "sbom"
+    };
+  }
+
+  rpc GetScan (GetScanRequest) returns (GetScanResponse) {
+    option (google.api.http) = {
+      get: "/v1/scan"
+    };
+  }
+
+  rpc GetScans (GetScansRequest) returns (GetScansResponse) {
+    option (google.api.http) = {
+      get: "/v1/scans"
+    };
+  }
+}
+
+message AddScanRequest {
+  string sbom = 1;
+}
+
+message AddScanResponse {
+  string report_id = 1;
+}
+
+message GetScanRequest {
+  string uuid = 1;
+}
+
+message GetScanResponse {
+  ScanReport report = 1;
+}
+
+message GetScansRequest {
+  int32 start = 1;
+  int32 end = 2;
+  string limit = 3;
+}
+
+message GetScansResponse {
+  ScanReport report = 1;
+}
+
+message ScanReport {
+  string uuid = 1;
+  string image = 2;
+  repeated string vulnerabilities = 3;
+}

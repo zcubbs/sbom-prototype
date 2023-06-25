@@ -1,0 +1,14 @@
+version: '2'
+sql:
+  - engine: "postgresql"
+    schema: "sql/migrations/"
+    queries: "sql/queries/"
+    gen:
+      go:
+        out: "internal/database"
+        package: "repository"
+        emit_json_tags: true
+        emit_exact_table_names: false
+        emit_prepared_queries: true
+        emit_interface: false
+        emit_empty_slices: false
