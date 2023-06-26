@@ -16,7 +16,8 @@ create table if not exists scan
     critical_count      int,
     high_count          int,
     medium_count        int,
-    low_count           int
+    low_count           int,
+    log                 text
 );
 
 create index if not exists scan_pk_index

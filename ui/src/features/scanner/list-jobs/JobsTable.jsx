@@ -103,6 +103,12 @@ export const JobsTable = () => {
             size: 350,
         },
         {
+            header: "Created",
+            accessorKey: "createdAt",
+            id: "created_at",
+            size: 180,
+        },
+        {
             header: "Risk Score",
             accessorKey: "risk_score",
             id: "risk_score",

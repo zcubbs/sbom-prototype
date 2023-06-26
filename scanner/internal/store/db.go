@@ -45,6 +45,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.getScansStmt, err = db.PrepareContext(ctx, getScans); err != nil {
 		return nil, fmt.Errorf("error preparing query GetScans: %w", err)
 	}
+	if q.updateScanStmt, err = db.PrepareContext(ctx, updateScan); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateScan: %w", err)
+	}
 	return &q, nil
 }
 
@@ -83,6 +86,11 @@ func (q *Queries) Close() error {
 	if q.getScansStmt != nil {
 		if cerr := q.getScansStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing getScansStmt: %w", cerr)
+		}
+	}
+	if q.updateScanStmt != nil {
+		if cerr := q.updateScanStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateScanStmt: %w", cerr)
 		}
 	}
 	return err
@@ -131,6 +139,7 @@ type Queries struct {
 	getScanByIdStmt      *sql.Stmt
 	getScanByUUIDStmt    *sql.Stmt
 	getScansStmt         *sql.Stmt
+	updateScanStmt       *sql.Stmt
 }
 
 func (q *Queries) WithTx(tx *sql.Tx) *Queries {
@@ -144,5 +153,6 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		getScanByIdStmt:      q.getScanByIdStmt,
 		getScanByUUIDStmt:    q.getScanByUUIDStmt,
 		getScansStmt:         q.getScansStmt,
+		updateScanStmt:       q.updateScanStmt,
 	}
 }

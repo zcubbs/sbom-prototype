@@ -52,6 +52,7 @@ message Scan {
   string artifact_name = 11;
   string artifact_version = 12;
   ScanReport report = 13;
+  string log = 14;
 }
 
 message Pagination {

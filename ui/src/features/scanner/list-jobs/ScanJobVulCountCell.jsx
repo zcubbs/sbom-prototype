@@ -1,6 +1,5 @@
 import React from 'react';
-import {Badge, Loader, Text, ThemeIcon} from "@mantine/core";
-import {IconClockPause} from "@tabler/icons-react";
+import {Badge} from "@mantine/core";
 
 const ScanJobVulCountCell = (value) => {
     if (value.getValue() === undefined) {

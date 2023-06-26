@@ -175,3 +175,13 @@ tasks:
     dir: "_dev/postgres"
     cmds:
       - cmd: docker-compose down {{.CLI_ARGS}}
+
+  redis-up:
+    dir: "_dev/redis"
+    cmds:
+      - cmd: docker-compose up -d
+
+  redis-down: ## task pb-down -- -v
+    dir: "_dev/redis"
+    cmds:
+      - cmd: docker-compose down {{.CLI_ARGS}}

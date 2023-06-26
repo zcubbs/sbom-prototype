@@ -14,7 +14,6 @@ func main() {
 
 	// Initialize new server with options
 	ns, err := server.NewServer(opts)
-
 	if err != nil {
 		logger.L().Panic(err)
 	}
@@ -23,6 +22,14 @@ func main() {
 	if err != nil {
 		return
 	}
+
+	// enable monitoring
+	go func() {
+		err := ns.StartMonitoring()
+		if err != nil {
+			logger.L().Fatal(err)
+		}
+	}()
 
 	// Start the server via goroutine
 	go ns.Start()

@@ -35,10 +35,11 @@ INSERT INTO scan (
                   artifact_name,
                   artifact_version,
                   created_at,
-                  updated_at
+                  updated_at,
+                  log
                   )
-values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-RETURNING id, uuid, created_at, updated_at, image, image_tag, status, sbom_id, report, artifact_id, artifact_name, artifact_version
+values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+RETURNING id, uuid, created_at, updated_at, image, image_tag, status, sbom_id, report, artifact_id, artifact_name, artifact_version, vulnerability_count, critical_count, high_count, medium_count, low_count, log
 `
 
 type CreateScanParams struct {
@@ -52,6 +53,7 @@ type CreateScanParams struct {
 	ArtifactVersion sql.NullString `json:"artifact_version"`
 	CreatedAt       time.Time      `json:"created_at"`
 	UpdatedAt       time.Time      `json:"updated_at"`
+	Log             sql.NullString `json:"log"`
 }
 
 func (q *Queries) CreateScan(ctx context.Context, arg CreateScanParams) (Scan, error) {
@@ -66,6 +68,7 @@ func (q *Queries) CreateScan(ctx context.Context, arg CreateScanParams) (Scan, e
 		arg.ArtifactVersion,
 		arg.CreatedAt,
 		arg.UpdatedAt,
+		arg.Log,
 	)
 	var i Scan
 	err := row.Scan(
@@ -81,6 +84,12 @@ func (q *Queries) CreateScan(ctx context.Context, arg CreateScanParams) (Scan, e
 		&i.ArtifactID,
 		&i.ArtifactName,
 		&i.ArtifactVersion,
+		&i.VulnerabilityCount,
+		&i.CriticalCount,
+		&i.HighCount,
+		&i.MediumCount,
+		&i.LowCount,
+		&i.Log,
 	)
 	return i, err
 }
@@ -108,7 +117,7 @@ func (q *Queries) DeleteScanByUUID(ctx context.Context, argUuid uuid.UUID) error
 }
 
 const getScanById = `-- name: GetScanById :one
-SELECT id, uuid, created_at, updated_at, image, image_tag, status, sbom_id, report, artifact_id, artifact_name, artifact_version
+SELECT id, uuid, created_at, updated_at, image, image_tag, status, sbom_id, report, artifact_id, artifact_name, artifact_version, vulnerability_count, critical_count, high_count, medium_count, low_count, log
 FROM scan
 WHERE id = $1
 `
@@ -129,12 +138,18 @@ func (q *Queries) GetScanById(ctx context.Context, id sql.NullInt32) (Scan, erro
 		&i.ArtifactID,
 		&i.ArtifactName,
 		&i.ArtifactVersion,
+		&i.VulnerabilityCount,
+		&i.CriticalCount,
+		&i.HighCount,
+		&i.MediumCount,
+		&i.LowCount,
+		&i.Log,
 	)
 	return i, err
 }
 
 const getScanByUUID = `-- name: GetScanByUUID :one
-SELECT id, uuid, created_at, updated_at, image, image_tag, status, sbom_id, report, artifact_id, artifact_name, artifact_version
+SELECT id, uuid, created_at, updated_at, image, image_tag, status, sbom_id, report, artifact_id, artifact_name, artifact_version, vulnerability_count, critical_count, high_count, medium_count, low_count, log
 FROM scan
 WHERE uuid = $1
 `
@@ -155,12 +170,18 @@ func (q *Queries) GetScanByUUID(ctx context.Context, argUuid uuid.UUID) (Scan, e
 		&i.ArtifactID,
 		&i.ArtifactName,
 		&i.ArtifactVersion,
+		&i.VulnerabilityCount,
+		&i.CriticalCount,
+		&i.HighCount,
+		&i.MediumCount,
+		&i.LowCount,
+		&i.Log,
 	)
 	return i, err
 }
 
 const getScans = `-- name: GetScans :many
-SELECT id, uuid, created_at, updated_at, image, image_tag, status, sbom_id, report, artifact_id, artifact_name, artifact_version
+SELECT id, uuid, created_at, updated_at, image, image_tag, status, sbom_id, report, artifact_id, artifact_name, artifact_version, vulnerability_count, critical_count, high_count, medium_count, low_count, log
 FROM scan
 ORDER BY created_at desc
 LIMIT $1 OFFSET $2
@@ -193,6 +214,12 @@ func (q *Queries) GetScans(ctx context.Context, arg GetScansParams) ([]Scan, err
 			&i.ArtifactID,
 			&i.ArtifactName,
 			&i.ArtifactVersion,
+			&i.VulnerabilityCount,
+			&i.CriticalCount,
+			&i.HighCount,
+			&i.MediumCount,
+			&i.LowCount,
+			&i.Log,
 		); err != nil {
 			return nil, err
 		}
@@ -205,4 +232,76 @@ func (q *Queries) GetScans(ctx context.Context, arg GetScansParams) ([]Scan, err
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateScan = `-- name: UpdateScan :one
+UPDATE scan
+SET
+    uuid = $2,
+    image = $3,
+    image_tag = $4,
+    sbom_id = $5,
+    status = $6,
+    artifact_id = $7,
+    artifact_name = $8,
+    artifact_version = $9,
+    created_at = $10,
+    updated_at = $11,
+    log = $12
+WHERE uuid = $1
+RETURNING id, uuid, created_at, updated_at, image, image_tag, status, sbom_id, report, artifact_id, artifact_name, artifact_version, vulnerability_count, critical_count, high_count, medium_count, low_count, log
+`
+
+type UpdateScanParams struct {
+	Uuid            uuid.UUID      `json:"uuid"`
+	Uuid_2          uuid.UUID      `json:"uuid_2"`
+	Image           string         `json:"image"`
+	ImageTag        string         `json:"image_tag"`
+	SbomID          sql.NullString `json:"sbom_id"`
+	Status          string         `json:"status"`
+	ArtifactID      uuid.NullUUID  `json:"artifact_id"`
+	ArtifactName    sql.NullString `json:"artifact_name"`
+	ArtifactVersion sql.NullString `json:"artifact_version"`
+	CreatedAt       time.Time      `json:"created_at"`
+	UpdatedAt       time.Time      `json:"updated_at"`
+	Log             sql.NullString `json:"log"`
+}
+
+func (q *Queries) UpdateScan(ctx context.Context, arg UpdateScanParams) (Scan, error) {
+	row := q.queryRow(ctx, q.updateScanStmt, updateScan,
+		arg.Uuid,
+		arg.Uuid_2,
+		arg.Image,
+		arg.ImageTag,
+		arg.SbomID,
+		arg.Status,
+		arg.ArtifactID,
+		arg.ArtifactName,
+		arg.ArtifactVersion,
+		arg.CreatedAt,
+		arg.UpdatedAt,
+		arg.Log,
+	)
+	var i Scan
+	err := row.Scan(
+		&i.ID,
+		&i.Uuid,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.Image,
+		&i.ImageTag,
+		&i.Status,
+		&i.SbomID,
+		&i.Report,
+		&i.ArtifactID,
+		&i.ArtifactName,
+		&i.ArtifactVersion,
+		&i.VulnerabilityCount,
+		&i.CriticalCount,
+		&i.HighCount,
+		&i.MediumCount,
+		&i.LowCount,
+		&i.Log,
+	)
+	return i, err
 }

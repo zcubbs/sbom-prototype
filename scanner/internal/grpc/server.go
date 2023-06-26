@@ -26,12 +26,17 @@ func NewServer(l logger.Logger) *Scanner {
 
 func (s *Scanner) AddScanImage(ctx context.Context, req *pb.AddScanImageRequest) (*pb.AddScanImageResponse, error) {
 	s.log.Infof("Handle AddScanImage request for %s", req.Image)
+
 	h := handler.New(s.log, config.DbConn, ctx)
 	uid, err := h.ScheduleScan(req.Image)
 	if err != nil {
 		return nil, err
 	}
 
+	err = config.NatsConn.Publish("scan-jobs", []byte(uid))
+	if err != nil {
+		s.log.Error(err)
+	}
 	s.log.Infof("scheduled job id: %+v\n", uid)
 
 	return &pb.AddScanImageResponse{

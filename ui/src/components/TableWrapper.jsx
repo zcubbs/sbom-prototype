@@ -35,7 +35,7 @@ const TableWrapper = ({scrolled, table}) => {
                verticalSpacing="xs"
                fontSize="sm"
                sx={{minWidth: 700}}
-               style={{ tableLayout: 'fixed', width: '100%' }}
+               // style={{ tableLayout: 'fixed', width: '100%' }}
         >
             <thead className={cx(classes.header, {[classes.scrolled]: scrolled})}>
             {table.getHeaderGroups().map(headerGroup => (

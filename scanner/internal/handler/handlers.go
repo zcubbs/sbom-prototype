@@ -98,6 +98,17 @@ func (h *Handler) RunScan(image string) (response *RunScanResponse, err error) {
 	}, nil
 }
 
+func (h *Handler) GetScan(uid string) (response *store.Scan, err error) {
+	s := store.New(h.db)
+
+	scan, err := s.GetScanByUUID(h.ctx, uuid.Must(uuid.Parse(uid)))
+	if err != nil {
+		return nil, err
+	}
+
+	return &scan, nil
+}
+
 type GetScanResponse struct {
 	Uuid            string
 	Image           string

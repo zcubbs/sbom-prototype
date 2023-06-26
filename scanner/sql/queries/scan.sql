@@ -9,9 +9,10 @@ INSERT INTO scan (
                   artifact_name,
                   artifact_version,
                   created_at,
-                  updated_at
+                  updated_at,
+                  log
                   )
-values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
 RETURNING *;
 
 -- name: GetScanByUUID :one
@@ -23,6 +24,23 @@ WHERE uuid = $1;
 SELECT *
 FROM scan
 WHERE id = $1;
+
+-- name: UpdateScan :one
+UPDATE scan
+SET
+    uuid = $2,
+    image = $3,
+    image_tag = $4,
+    sbom_id = $5,
+    status = $6,
+    artifact_id = $7,
+    artifact_name = $8,
+    artifact_version = $9,
+    created_at = $10,
+    updated_at = $11,
+    log = $12
+WHERE uuid = $1
+RETURNING *;
 
 -- name: DeleteScanById :exec
 DELETE
