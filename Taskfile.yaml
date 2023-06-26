@@ -185,3 +185,8 @@ tasks:
     dir: "_dev/redis"
     cmds:
       - cmd: docker-compose down {{.CLI_ARGS}}
+
+  test:scanner:
+    dir: "scanner"
+    cmds:
+      - task: go test

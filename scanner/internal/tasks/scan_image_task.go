@@ -2,7 +2,6 @@ package tasks
 
 import (
 	"context"
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"github.com/google/uuid"
@@ -33,22 +32,22 @@ func (d *RedisTaskDispatcher) DispatchScanImageTask(ctx context.Context, payload
 	return nil
 }
 
-func (p *RedisTaskProcessor) ProcessScanImageTask(ctx context.Context, task *asynq.Task) error {
-	var payload ScanImagePayload
-	if err := json.Unmarshal(task.Payload(), &payload); err != nil {
-		return fmt.Errorf("json.Unmarshal failed: %w", asynq.SkipRetry)
-	}
-
-	scan, err := p.store.GetScan(ctx, payload.JobUUID)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			return fmt.Errorf("scan not found: %w", asynq.SkipRetry)
-		}
-		return fmt.Errorf("could not get scan: %w", err)
-	}
-
-	// TODO: scan image
-	p.logger.Infof("scan image: %s", payload.Image)
-
-	return nil
-}
+//func (p *RedisTaskProcessor) ProcessScanImageTask(ctx context.Context, task *asynq.Task) error {
+//	var payload ScanImagePayload
+//	if err := json.Unmarshal(task.Payload(), &payload); err != nil {
+//		return fmt.Errorf("json.Unmarshal failed: %w", asynq.SkipRetry)
+//	}
+//
+//	scan, err := p.store.GetScan(ctx, payload.JobUUID)
+//	if err != nil {
+//		if err == sql.ErrNoRows {
+//			return fmt.Errorf("scan not found: %w", asynq.SkipRetry)
+//		}
+//		return fmt.Errorf("could not get scan: %w", err)
+//	}
+//
+//	// TODO: scan image
+//	p.logger.Infof("scan image: %s", payload.Image)
+//
+//	return nil
+//}

@@ -4,10 +4,9 @@ import (
 	"context"
 	"flag"
 	"github.com/zcubbs/zlogger/pkg/logger"
+	"zel/sbom-prototype/scanner/db"
 	"zel/sbom-prototype/scanner/internal/config"
 	scannerGrpc "zel/sbom-prototype/scanner/internal/grpc"
-
-	"zel/sbom-prototype/scanner/sql"
 )
 
 func main() {
@@ -30,7 +29,7 @@ func main() {
 	}
 
 	// Migrate database
-	sql.MigrateDB(cfg.Database)
+	db.MigrateDB(cfg.Database)
 
 	// Open Nats connection
 	err = config.ConnectToNats(cfg.Nats)

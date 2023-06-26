@@ -7,31 +7,21 @@ package db
 import (
 	"database/sql"
 	"time"
+
+	"github.com/google/uuid"
+	"github.com/tabbed/pqtype"
 )
 
-type Artifact struct {
-	ID              int64     `json:"id"`
-	ArtifactType    string    `json:"artifact_type"`
-	ArtifactName    string    `json:"artifact_name"`
-	ArtifactVersion string    `json:"artifact_version"`
-	CreatedAt       time.Time `json:"created_at"`
-}
-
-type Sbom struct {
-	ID         int64          `json:"id"`
-	CreatedAt  time.Time      `json:"created_at"`
-	ArtifactID int64          `json:"artifact_id"`
-	Manifest   sql.NullString `json:"manifest"`
-	Status     string         `json:"status"`
-	JobLog     sql.NullString `json:"job_log"`
-}
-
-type Scan struct {
-	ID         int64          `json:"id"`
-	CreatedAt  time.Time      `json:"created_at"`
-	UpdatedAt  time.Time      `json:"updated_at"`
-	ArtifactID int64          `json:"artifact_id"`
-	Status     string         `json:"status"`
-	Report     sql.NullString `json:"report"`
-	JobLog     sql.NullString `json:"job_log"`
+type ScanJob struct {
+	ID              int64                 `json:"id"`
+	CreatedAt       time.Time             `json:"created_at"`
+	UpdatedAt       time.Time             `json:"updated_at"`
+	SbomUuid        uuid.NullUUID         `json:"sbom_uuid"`
+	ArtifactUuid    uuid.NullUUID         `json:"artifact_uuid"`
+	ArtifactName    string                `json:"artifact_name"`
+	ArtifactVersion string                `json:"artifact_version"`
+	ArtifactType    string                `json:"artifact_type"`
+	Status          string                `json:"status"`
+	Report          pqtype.NullRawMessage `json:"report"`
+	JobLog          sql.NullString        `json:"job_log"`
 }
