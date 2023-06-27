@@ -23,7 +23,7 @@ jobs:
         id: go
 
       - name: Install Task
-        run: curl -sL https://taskfile.dev/install.sh | sh
+        run: sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d
 
       - name: Run tests
         run: task test:scanner
