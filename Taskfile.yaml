@@ -166,22 +166,22 @@ tasks:
       - cmd: Powershell.exe Remove-Item {{ .DIR_PATH }} -Recurse -Force -ErrorAction SilentlyContinue
         ignore_error: true
 
-  pg-up:
+  pg:up:
     dir: "_dev/postgres"
     cmds:
       - cmd: docker-compose up -d
 
-  pg-down: ## task pb-down -- -v
+  pg:down: ## task pb-down -- -v
     dir: "_dev/postgres"
     cmds:
       - cmd: docker-compose down {{.CLI_ARGS}}
 
-  redis-up:
+  redis:up:
     dir: "_dev/redis"
     cmds:
       - cmd: docker-compose up -d
 
-  redis-down: ## task pb-down -- -v
+  redis:down: ## task pb-down -- -v
     dir: "_dev/redis"
     cmds:
       - cmd: docker-compose down {{.CLI_ARGS}}
@@ -190,3 +190,10 @@ tasks:
     dir: "scanner"
     cmds:
       - cmd: go test ./... -coverprofile=coverage.out
+
+  migrate:scanner:up:
+    dir: "scanner"
+    vars:
+        DATABASE_URL: "postgres://postgres:postgres@localhost:5432/scanner?sslmode=disable"
+    cmds:
+      - cmd: migrate -path ./db/migrations -database {{ .DATABASE_URL }} up
