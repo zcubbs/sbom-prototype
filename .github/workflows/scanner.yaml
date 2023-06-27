@@ -40,10 +40,7 @@ jobs:
         run: go install github.com/go-task/task/v3/cmd/task@latest
 
       - name: Install Migrate CLI
-        run: |
-          curl -L https://github.com/golang-migrate/migrate/releases/download/v4.16.2/migrate.linux-amd64.tar.gz | tar xvz
-          mv migrate.linux-amd64 /usr/bin
-          which migrate
+        run: go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
 
       - name: Run DB migrations
         run: task migrate:up

@@ -13,6 +13,7 @@ tasks:
       - cmd: go install github.com/bufbuild/buf/cmd/buf@latest
       - cmd: go install github.com/golang/protobuf/protoc-gen-go@latest
       - cmd: go install github.com/fullstorydev/grpcurl/cmd/grpcurl@latest
+      - cmd: go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
       - cmd: go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@latest
       - cmd: go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@latest
 
