@@ -23,7 +23,7 @@ jobs:
         id: go
 
       - name: Install Task
-        run: sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d
+        run: go install github.com/go-task/task/v3/cmd/task@latest
 
       - name: Run tests
-        run: /bin/task test:scanner
+        run: task test:scanner
