@@ -189,4 +189,4 @@ tasks:
   test:scanner:
     dir: "scanner"
     cmds:
-      - task: go test
+      - cmd: go test ./... -coverprofile=coverage.out

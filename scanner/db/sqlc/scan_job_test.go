@@ -69,10 +69,14 @@ func TestQueries_UpdateScanJob(t *testing.T) {
 	scanJob := createRandomScanJob(t)
 
 	arg := UpdateScanJobParams{
-		ID:     scanJob.ID,
-		Status: "scanning",
-		Report: pqtype.NullRawMessage{},
-		JobLog: sql.NullString{},
+		ArtifactUuid:    uuid.NullUUID{},
+		ArtifactName:    util.RandomArtifactName(),
+		ArtifactVersion: util.RandomArtifactVersion(),
+		ArtifactType:    util.RandomArtifactType(),
+		Status:          "scanning",
+		Report:          pqtype.NullRawMessage{},
+		JobLog:          sql.NullString{},
+		ID:              scanJob.ID,
 	}
 
 	got, err := testQueries.UpdateScanJob(context.Background(), arg)
