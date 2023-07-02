@@ -8,19 +8,24 @@ import (
 	"github.com/tabbed/pqtype"
 )
 
-type Store struct {
+type Store interface {
+	Querier
+	CreateScanJobTx(ctx context.Context, arg CreateScanJobParamsTx) (CreateScanJobParamsTxResult, error)
+}
+
+type SQLStore struct {
 	*Queries
 	db *sql.DB
 }
 
-func NewStore(db *sql.DB) *Store {
-	return &Store{
+func NewStore(db *sql.DB) Store {
+	return &SQLStore{
 		db:      db,
 		Queries: New(db),
 	}
 }
 
-func (store *Store) execTx(ctx context.Context, fn func(*Queries) error) error {
+func (store *SQLStore) execTx(ctx context.Context, fn func(*Queries) error) error {
 	tx, err := store.db.BeginTx(ctx, nil)
 	if err != nil {
 		return err
@@ -44,7 +49,7 @@ type CreateScanJobParamsTxResult struct {
 	ScanJob
 }
 
-func (store *Store) CreateScanJobTx(ctx context.Context, arg CreateScanJobParamsTx) (CreateScanJobParamsTxResult, error) {
+func (store *SQLStore) CreateScanJobTx(ctx context.Context, arg CreateScanJobParamsTx) (CreateScanJobParamsTxResult, error) {
 	var result CreateScanJobParamsTxResult
 
 	err := store.execTx(ctx, func(q *Queries) error {

@@ -1,4 +1,4 @@
-package config
+package util
 
 import "github.com/zcubbs/zlogger/pkg/logger"
 

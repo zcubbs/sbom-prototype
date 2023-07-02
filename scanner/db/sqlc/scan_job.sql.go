@@ -13,6 +13,17 @@ import (
 	"github.com/tabbed/pqtype"
 )
 
+const countScanJobs = `-- name: CountScanJobs :one
+SELECT count(*) AS count
+`
+
+func (q *Queries) CountScanJobs(ctx context.Context) (int64, error) {
+	row := q.db.QueryRowContext(ctx, countScanJobs)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const deleteScanJob = `-- name: DeleteScanJob :exec
 DELETE
 FROM scan_jobs
@@ -67,7 +78,7 @@ func (q *Queries) GetScanJobsList(ctx context.Context, arg GetScanJobsListParams
 		return nil, err
 	}
 	defer rows.Close()
-	var items []ScanJob
+	items := []ScanJob{}
 	for rows.Next() {
 		var i ScanJob
 		if err := rows.Scan(

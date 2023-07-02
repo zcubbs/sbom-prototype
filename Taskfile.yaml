@@ -16,6 +16,12 @@ tasks:
       - cmd: go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
       - cmd: go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@latest
       - cmd: go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@latest
+      - cmd: go install go.uber.org/mock/mockgen@latest
+
+  mock:scanner:
+    dir: "scanner"
+    cmds:
+      - cmd: mockgen -destination db/mock/store.go zel/sbom-prototype/scanner/db/sqlc Store
 
   sqlc:
     cmds:

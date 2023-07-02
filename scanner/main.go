@@ -7,6 +7,7 @@ import (
 	"zel/sbom-prototype/scanner/db"
 	"zel/sbom-prototype/scanner/internal/config"
 	scannerGrpc "zel/sbom-prototype/scanner/internal/grpc"
+	"zel/sbom-prototype/scanner/util"
 )
 
 func main() {
@@ -17,7 +18,7 @@ func main() {
 	defer cancel()
 
 	// Bootstrap configuration
-	cfg := config.Bootstrap()
+	cfg := util.Bootstrap()
 
 	// Setup logger
 	logger.SetupLogger(cfg.LoggerType)

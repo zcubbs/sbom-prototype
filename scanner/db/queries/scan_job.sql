@@ -43,3 +43,6 @@ RETURNING *;
 DELETE
 FROM scan_jobs
 WHERE id = $1;
+
+-- name: CountScanJobs :one
+SELECT count(*) AS count;

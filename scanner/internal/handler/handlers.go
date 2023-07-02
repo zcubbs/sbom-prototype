@@ -4,10 +4,12 @@ import (
 	"context"
 	"database/sql"
 	"github.com/google/uuid"
+	"github.com/tabbed/pqtype"
 	"github.com/zcubbs/zlogger/pkg/logger"
+	"strconv"
 	"time"
+	db "zel/sbom-prototype/scanner/db/sqlc"
 	"zel/sbom-prototype/scanner/internal/runtime"
-	"zel/sbom-prototype/scanner/internal/store"
 )
 
 type Handler struct {
@@ -30,18 +32,16 @@ type RunScanResponse struct {
 	Image  string
 }
 
-func (h *Handler) ScheduleScan(image string) (scheduleUuid string, err error) {
-	s := store.New(h.db)
-	scan, err := s.CreateScan(h.ctx, store.CreateScanParams{
-		Uuid:            uuid.New(),
-		Image:           image,
-		SbomID:          sql.NullString{},
+func (h *Handler) ScheduleScan(image string) (id string, err error) {
+	s := db.NewStore(h.db)
+	scan, err := s.InsertScanJob(h.ctx, db.InsertScanJobParams{
+		ArtifactUuid:    uuid.NullUUID{},
+		ArtifactName:    "test",
+		ArtifactVersion: "1.0.0",
+		ArtifactType:    "image",
 		Status:          "pending",
-		ArtifactID:      uuid.NullUUID{},
-		ArtifactName:    sql.NullString{},
-		ArtifactVersion: sql.NullString{},
-		CreatedAt:       time.Now(),
-		UpdatedAt:       time.Now(),
+		Report:          pqtype.NullRawMessage{},
+		JobLog:          sql.NullString{},
 	})
 	if err != nil {
 		return "", err
@@ -49,7 +49,7 @@ func (h *Handler) ScheduleScan(image string) (scheduleUuid string, err error) {
 
 	h.logger.Infof("scan: %+v\n", scan)
 
-	return scan.Uuid.String(), nil
+	return strconv.FormatInt(scan.ID, 10), nil
 }
 
 func (h *Handler) RunScan(image string) (response *RunScanResponse, err error) {
@@ -98,10 +98,10 @@ func (h *Handler) RunScan(image string) (response *RunScanResponse, err error) {
 	}, nil
 }
 
-func (h *Handler) GetScan(uid string) (response *store.Scan, err error) {
-	s := store.New(h.db)
+func (h *Handler) GetScan(id int64) (response *db.ScanJob, err error) {
+	s := db.NewStore(h.db)
 
-	scan, err := s.GetScanByUUID(h.ctx, uuid.Must(uuid.Parse(uid)))
+	scan, err := s.GetScanJobByID(h.ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -132,7 +132,7 @@ type GetScansResponse struct {
 }
 
 func (h *Handler) GetScans(limit, page int32) (response *GetScansResponse, err error) {
-	s := store.New(h.db)
+	s := db.NewStore(h.db)
 
 	if limit == 0 {
 		limit = 10
@@ -146,7 +146,7 @@ func (h *Handler) GetScans(limit, page int32) (response *GetScansResponse, err e
 		limit = 10
 	}
 
-	scans, err := s.GetScans(h.ctx, store.GetScansParams{
+	scans, err := s.GetScanJobsList(h.ctx, db.GetScanJobsListParams{
 		Limit:  limit,
 		Offset: offset,
 	})
@@ -158,19 +158,20 @@ func (h *Handler) GetScans(limit, page int32) (response *GetScansResponse, err e
 
 	for _, scan := range scans {
 		scansResponse = append(scansResponse, &GetScanResponse{
-			Uuid:            scan.Uuid.String(),
-			Image:           scan.Image,
-			SbomID:          scan.SbomID.String,
+			Uuid:            scan.ArtifactUuid.UUID.String(),
+			Image:           scan.ArtifactName,
+			ImageTag:        scan.ArtifactVersion,
+			SbomID:          scan.SbomUuid.UUID.String(),
 			Status:          scan.Status,
-			ArtifactID:      scan.ArtifactID.UUID.String(),
-			ArtifactName:    scan.ArtifactName.String,
-			ArtifactVersion: scan.ArtifactVersion.String,
-			CreatedAt:       scan.CreatedAt,
-			UpdatedAt:       scan.UpdatedAt,
+			ArtifactID:      scan.ArtifactUuid.UUID.String(),
+			ArtifactName:    scan.ArtifactName,
+			ArtifactVersion: scan.ArtifactVersion,
+			CreatedAt:       time.Time{},
+			UpdatedAt:       time.Time{},
 		})
 	}
 
-	count, err := s.CountScans(h.ctx)
+	count, err := s.CountScanJobs(h.ctx)
 	if err != nil {
 		return nil, err
 	}
